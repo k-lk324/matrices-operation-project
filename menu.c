@@ -30,15 +30,18 @@ int main()
         case create_matrix:
             //δημιουργια πίνακα
             break;
-        case show_matrixes:
+        case show_matrix:
             //προβολή πίνακα
             break;
-        case matrix_operations;
+        case matrix_operations:
             //πραξεις πινάκων
             break;
-        case vector_operations;
+        case vector_operations:
             //πράξεις διανυσμάτων
             break;
+        //default:
+            //stuff
+    }
 
         default:
 

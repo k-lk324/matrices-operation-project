@@ -43,11 +43,6 @@ int main()
             //stuff
     }
 
-        default:
-
-
-    }
-
     return 0;
 }
 

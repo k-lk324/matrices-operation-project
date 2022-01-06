@@ -7,40 +7,33 @@
 #define NOT_DEBUG
 #define NOT_DEBUGSTR
 
-char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n1.Δημιουργία συστυχίας\n2.Προβολή διαθέσιμων συστοιχιών\n3.Πράξεις πινάκων\n4.Πράξεις διανυσμάτων\n5.Διαγραφή συστυχίας\n6.Έξοδος\n\n";
+char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
+1.Δημιουργία συστυχίας\n\
+2.Προβολή διαθέσιμων συστοιχιών\n\
+3.Φόρτωση συστυχίας\n\
+4.Διαγραφή συστυχίας\n\
+5.Πράξεις πινάκων\n\
+6.Πράξεις διανυσμάτων\n\
+7.Έξοδος\n\n";
 
-struct matrix
-{
+struct matrix{
     double mat[ROWS_MAX][COLS_MAX];
     int rows,cols;
 };
 
-//ζητάει απο χρήστη πίνακα: διαστάσεις και στοιχεία
 struct matrix getmatrix();
-
-//δημιουργεί συστυχία και αποθηκεύει σε txt file
-//επιστρέφει false αν δεν κατάφερει να ανοιξει το αρχείο
-//επιστρέφει true αν εκτελεστεί ο κώδικας κανονικά
 bool save_matrix();
-
-//προβάλει τους διαθέσιμους πίνακες
 bool show_matrixes();
-
-//τυπώνει μενού με επιλόγές και ζητάει επιλογή απο τον χρήστη
-//επιστρέφει την επιλογή του χρήστη -1
+bool load_matrix();
 int menu(char* menu);
-
-//τυπώνει τα στοιχεία ενος πίνακα επιλογής του χρήστη
 void print_elements();
-
 int delete_matrixName(char* name);
-
 int delete_matrix();
 
 int main()
 {
-    enum {create_matrix, show_matrix,
-          matrix_operations, vector_operations, del, exit};
+    enum {create_matrix, show_matrix, ld_matrix, del,
+          matrix_operations, vector_operations, exit};
 
     bool stop = false;
 
@@ -48,7 +41,6 @@ int main()
     {
         switch(menu(prime_menu))
         {
-
         case create_matrix:
             save_matrix();
             break;
@@ -56,6 +48,10 @@ int main()
         case show_matrix:
             show_matrixes();
             print_elements();
+            break;
+
+        case ld_matrix:
+            load_matrix();
             break;
 
         case matrix_operations:
@@ -82,6 +78,7 @@ int main()
     return 0;
 }
 
+//ζητάει απο χρήστη πίνακα: διαστάσεις και στοιχεία
 struct matrix getmatrix()
 {
     struct matrix y;
@@ -105,6 +102,9 @@ struct matrix getmatrix()
     return y;
 }
 
+//δημιουργεί συστυχία και αποθηκεύει σε txt file
+//επιστρέφει false αν δεν κατάφερει να ανοιξει το αρχείο
+//επιστρέφει true αν εκτελεστεί ο κώδικας κανονικά
 bool save_matrix(){
 
     #ifdef DEBUG
@@ -129,16 +129,6 @@ bool save_matrix(){
     fprintf (am_file,"%s\n",name);
     fclose(am_file);
 
-    //αν ειναι διανυσμα κατέγραψε όνομα και σε ξεχωριστό αρχειο
-    if(x.cols == 0){
-        FILE* vector_file;
-        vector_file = fopen ("vectors.txt", "a");
-        if (vector_file == NULL) return false;
-
-        fprintf(vector_file,"%s\n",name);
-        fclose(vector_file);
-    }
-
     //πρόσθεσε την καταληξη ".txt" στο αναγνωριστικο
     strcat(name, ".txt");
 
@@ -160,6 +150,7 @@ bool save_matrix(){
     return true;
 }
 
+//προβάλει τους διαθέσιμους πίνακες
 bool show_matrixes(){
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
@@ -175,6 +166,48 @@ bool show_matrixes(){
     return true;
 }
 
+//φορτώνει δισδιάστατη συστυχία από αρχείο txt
+bool load_matrix()
+{
+    // οδηγίες
+    printf("Για φόρτωση συστοιχίας από αρχείο πρέπει:\n");
+    printf("-Το αρχείο πρέπει να έχει επέκταση txt και στο ίδιο directory\n");
+    printf("-Ο αριθμός των γραμμών να αναγράφεται στην πρώτη γραμμή\n");
+    printf("-Ο αριθμός των στηλών να αναγράφεται στην δεύτερη γραμμή\n");
+    printf("-Μέγιστες δυνατές διαστάσεις: 100x100\n\n");
+
+    //εισαγωγη ονοματος συστοιχιας απο το χρηστη
+    char matrixName[50];
+    char filename[50];
+    printf("Εισαγωγή ονόματος συστοιχίας (χωρίς επέκταση txt): ");
+    scanf(matrixName);
+
+    strcpy(filename, matrixName);
+    strcat(filename, ".txt");
+
+    //ανοιγμα αρχείου σε read mode
+    FILE *fp;
+    fp = fopen(filename,"r");
+
+    //αν υπάρξει αδυναμία άνοιγμα αρχείου
+    if (fp == NULL)
+        printf("Aδυναμία άνοιγμα αρχείου\n");
+    else{
+    //αλλιως αποθήκευσε το όνομα της συστοιχίας στο available_matrix.txt
+    FILE* am_file;
+    am_file = fopen("available_matrix.txt", "a");
+    if (am_file == NULL)
+        printf("Αδυναμία φόρτωσης συστοιχίας\n");
+
+    fprintf (am_file,"%s\n",matrixName);
+    fclose(am_file);
+    }
+
+    return 0;
+}
+
+//τυπώνει μενού με επιλόγές και ζητάει επιλογή απο τον χρήστη
+//επιστρέφει την επιλογή του χρήστη -1
 int menu(char* menu)
 {
     printf(prime_menu);
@@ -186,6 +219,7 @@ int menu(char* menu)
     return choice-1;
 }
 
+//τυπώνει τα στοιχεία ενος πίνακα επιλογής του χρήστη
 void print_elements()
 {
     printf("\nΕπιλογή πίνακα για προβολή: ");
@@ -225,9 +259,9 @@ int delete_matrixName(char* name)
     FILE *fp1, *fp2;
     char matrixName[50];
 
-    //άνοιγμα αρχειου σε αναγνωση??
+    //άνοιγμα αρχειου σε read mode
     fp1 = fopen("available_matrix.txt", "r");
-    //άνοιγμα αρχειου σε γραψιμο??
+    //άνοιγμα αρχειου σε write mode
     fp2 = fopen("copy.txt", "w");
 
     while ((fscanf(fp1,"%s",matrixName))!= EOF)
@@ -275,3 +309,4 @@ int delete_matrix()
 
     return 0;
 }
+

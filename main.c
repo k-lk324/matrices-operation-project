@@ -4,7 +4,7 @@
 #include <string.h>
 #define ROWS_MAX 100
 #define COLS_MAX 100
-#define NOT_DEBUG
+#define DEBUG
 #define NOT_DEBUGSTR
 
 char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
@@ -28,7 +28,7 @@ bool show_matrixes();
 bool load_matrix();
 int menu(char* menu);
 void print_elements();
-int delete_matrixName(char* name);
+bool delete_matrixName(char* name);
 int delete_matrix();
 struct matrix choose_matrix(char*);
 struct matrix matrix_result(int);
@@ -184,6 +184,9 @@ bool show_matrixes(){
         return false;
     }
 
+    //κλεισιμο αρχειου
+    fclose(AM);
+
     return true;
 }
 
@@ -275,42 +278,47 @@ void print_elements()
 }
 
 //διαγράφει το όνομα της συστοιχίας απο το "available_matrix.txt"
-int delete_matrixName(char* name)
+bool delete_matrixName(char* name)
 {
-    FILE *fp1, *fp2;
+    FILE *am_fp, *copy_fp;
     char matrixName[50];
+    char available_matrix[] = "available_matrix.txt";
 
     //άνοιγμα αρχειου σε read mode
-    fp1 = fopen("available_matrix.txt", "r");
+    am_fp = fopen(available_matrix, "r");
     //άνοιγμα αρχειου σε write mode
-    fp2 = fopen("copy.txt", "w");
+    copy_fp = fopen("copy.txt", "w");
 
-    while (fscanf(fp1,"%s",matrixName) != EOF)
+    while (fscanf(am_fp,"%s",matrixName) != EOF)
     {
-
         //εκτος απο την συστυχια για διαγραφη
-        if (strcmp(name,matrixName) != 0)
+        if (strcmp(name,matrixName) != 0){
             //αντέγραψε ολες τις υπόλοιπες γραμμες στο copy.txt
-            fprintf(fp2, "%s\n",matrixName);
+            fprintf(copy_fp, "%s\n",matrixName);
+            printf("%s\n", matrixName);
+            }
+        else
+            printf("Ο πίνακας εντωπίστηκε\n");
     }
 
     // ελεγχος οτι δεν ειναι σφάλμα της fscanf
-    if (!feof(fp1)){
+    if (!feof(am_fp)){
         printf("Παρουσιάστηκε σφάλμα\n");
-        return 1;
+        return false;
     }
 
-    fclose(fp1);
-    fclose(fp2);
+    //κλείσιμο αρχείων
+    fclose(am_fp);
+    fclose(copy_fp);
 
     //διαγραφη αρχικου αρχειου
-    remove("available_matrix.txt");
+    if (remove(available_matrix) != 0)
+        return false;
 
     //μετονομασια του copy.txt σε available_matrix.txt
     rename("copy.txt", "available_matrix.txt");
-    printf("Διαγράφτηκε επιτυχώς\n");
 
-    return 0;
+    return true;
 }
 
 //διαγράφει αρχείο συστοιχίας
@@ -327,13 +335,12 @@ int delete_matrix()
     //προσθεσε την καταληξη ".txt"
     strcat(filename, ".txt");
 
-//    if (remove(filename) == 0)
-//        printf("Διαγράφτηκε επιτυχως\n");
-//    else
-//        printf("Αδυναμία διαγραφης\n");
-
-    //για να μην προβάλεται στους διαθέσιμες συστοιχίες
     delete_matrixName(name);
+
+    if (remove(filename) == 0)
+        printf("Διαγράφτηκε επιτυχως\n");
+    else
+        printf("Αδυναμία διαγραφης\n");
 
     return 0;
 }

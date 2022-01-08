@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#define ROWS_MAX 20
-#define COLS_MAX 20
+#define ROWS_MAX 100
+#define COLS_MAX 100
 #define NOT_DEBUG
 #define NOT_DEBUGSTR
 
@@ -61,28 +61,20 @@ int main()
                 break;
 
             case matrix_operations:
-                {
-                    printf("");
-
-                    int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
-
+                printf("\n");
+                int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
+                if (choice >= 1 && choice <=3){
                     struct matrix result = matrix_result(choice);
 
+                    //προβολή αποτελέσματος
+                    for (int i=0; i<result.rows; i++){
+                        for (int j=0; j<result.cols; j++)
+                            printf("%15lf ", result.mat[i][j]);
+                        printf("\n");
+                    }
                 }
-
-
-               // matrix_result();
-//
-//
-//            //πραξεις
-//            //πινακας: str matrixC
-//
-//            //for (int i=0; i<matrixC.rows;i++)
-//                //for (int j=0; j<matrixC.cols; j++)
-//                    //printf("%d", matrixC[i][j]);
-//                //printf("\n");
-//        }
-
+                else
+                    printf("H επιλογή δεν υπάρχει\n");
             break;
         case vector_operations:
             //πράξεις διανυσμάτων
@@ -99,6 +91,10 @@ int main()
         default:
             printf("Η επιλογή που βάλατε δεν υπάρχει\n");
         }
+
+        //άφησε 3 κενές γραμμές
+        for (int i=0; i<3; i++)
+            printf("\n");
     }
 
     return 0;
@@ -312,7 +308,6 @@ int delete_matrixName(char* name)
 
     //μετονομασια του copy.txt σε available_matrix.txt
     rename("copy.txt", "available_matrix.txt");
-
     printf("Διαγράφτηκε επιτυχώς\n");
 
     return 0;
@@ -322,8 +317,8 @@ int delete_matrixName(char* name)
 int delete_matrix()
 {
     char name[50];
-
-    printf ("Εισαγωγη συστυχίας για διαγραφη: ");
+    show_matrixes();
+    printf ("Εισαγωγή συστυχίας για διαγραφή: ");
     scanf("%s", name);
 
     char filename[50];
@@ -410,37 +405,3 @@ struct matrix matrix_result(int operation){
 
     return matrixC;
 }
-
-
-
-//
-//bool matrix_result(struct matrix *matrixA, struct matrix *matrixB, struct matrix *matrixC){
-//
-//    //μενού πράξεων
-//    int op_choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
-//
-//    //δημιουργία πίνακα Α και Β
-//    //*matrixA = choose_matrix();
-//    //*matrixB = choose_matrix();
-//
-//    //περιπτώσεις πράξεων
-//    enum {sum=1, subtraction, multiplication};
-//
-//    switch(op_choice)
-//    {
-//        case sum:
-//            //matrixC = πρόσθεση(matrixA, matrixB)
-//            break;
-//        case subtraction:
-//            //matrixC = αφαίρεση(matrixA, matrixB)
-//            break;
-//        case multiplication:
-//            //matrixC = πολ/σμος(matrixA, matrixB)
-//            break;
-//        default:
-//        printf("Η επίλογη αυτή δεν υπάρχει\n");
-//    }
-//
-//    return true;
-//}
-

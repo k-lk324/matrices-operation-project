@@ -2,19 +2,20 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#define ROWS_MAX 100
-#define COLS_MAX 100
+#define ROWS_MAX 20
+#define COLS_MAX 20
 #define NOT_DEBUG
 #define NOT_DEBUGSTR
 
 char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
-1.Δημιουργία συστυχίας\n\
+1.Δημιουργία συστοιχίας\n\
 2.Προβολή διαθέσιμων συστοιχιών\n\
 3.Φόρτωση συστοιχίας\n\
 4.Διαγραφή συστοιχίας\n\
 5.Πράξεις πινάκων\n\
 6.Πράξεις διανυσμάτων\n\
 7.Έξοδος\n\n";
+
 
 struct matrix{
     double mat[ROWS_MAX][COLS_MAX];
@@ -29,33 +30,58 @@ int menu(char* menu);
 void print_elements();
 int delete_matrixName(char* name);
 int delete_matrix();
+struct matrix choose_matrix(char*);
+struct matrix matrix_result(int);
 
 int main()
 {
-    enum {create_matrix, show_matrix, ld_matrix, del,
+    enum {create_matrix=1, show_matrix, ld_matrix, del,
           matrix_operations, vector_operations, exit};
 
     bool stop = false;
 
-    while(!stop)
-    {
+    //μέχρι ο χρήστης να επιλέξει να σταματήσει το πρόγραμμα
+    while(!stop){
+        fflush(stdin);
+
+        //επιλογές του αρχικού μενού
         switch(menu(prime_menu))
         {
-        case create_matrix:
-            save_matrix();
-            break;
+            case create_matrix:
+                save_matrix();
+                break;
 
-        case show_matrix:
-            show_matrixes();
-            print_elements();
-            break;
+            case show_matrix:
+                show_matrixes();
+                print_elements();
+                break;
 
-        case ld_matrix:
-            load_matrix();
-            break;
+            case ld_matrix:
+                load_matrix();
+                break;
 
-        case matrix_operations:
-            //πραξεις πινάκων
+            case matrix_operations:
+                {
+                    printf("");
+
+                    int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
+
+                    struct matrix result = matrix_result(choice);
+
+                }
+
+
+               // matrix_result();
+//
+//
+//            //πραξεις
+//            //πινακας: str matrixC
+//
+//            //for (int i=0; i<matrixC.rows;i++)
+//                //for (int j=0; j<matrixC.cols; j++)
+//                    //printf("%d", matrixC[i][j]);
+//                //printf("\n");
+//        }
 
             break;
         case vector_operations:
@@ -71,7 +97,7 @@ int main()
             break;
 
         default:
-            printf("Η επιλογη που βάλατε δεν υπάρχει\n");
+            printf("Η επιλογή που βάλατε δεν υπάρχει\n");
         }
     }
 
@@ -107,14 +133,11 @@ struct matrix getmatrix()
 //επιστρέφει true αν εκτελεστεί ο κώδικας κανονικά
 bool save_matrix(){
 
-    #ifdef DEBUG
-    printf("save_matrix test 1 line 135");
-    #endif // DEBUG
-
     //αναγνωριστικο πίνακα
     printf("\nΟρισμός αναγνωριστικού: ");
     char name[50];
     scanf("%s", name);
+    fflush(stdin);
 
 #ifndef DEBUGSTR
 
@@ -146,7 +169,7 @@ bool save_matrix(){
         fprintf(file, "\n");
     }
     fclose(file);
-    #endif // DEBUGSTR
+#endif // DEBUGSTR
     return true;
 }
 
@@ -157,11 +180,13 @@ bool show_matrixes(){
 
     char matrixName[50];
     //επανέλαβε μέχρι το τέλος του αρχείου
-    while ((fscanf(AM,"%s",matrixName))!= EOF){
-        //&& ελεγχος οτι δεν ειναι σφάλμα της fscanf
-
+    while ((fscanf(AM,"%s",matrixName))!= EOF)
         printf("%s\n", matrixName);
-     }
+
+    if (!feof(AM)){
+        printf("Παρουσιάστηκε σφάλμα\n");
+        return false;
+    }
 
     return true;
 }
@@ -180,7 +205,7 @@ bool load_matrix()
     char matrixName[50];
     char filename[50];
     printf("Εισαγωγή ονόματος συστοιχίας (χωρίς επέκταση txt): ");
-    scanf(matrixName);
+    scanf("%s", matrixName);
 
     strcpy(filename, matrixName);
     strcat(filename, ".txt");
@@ -207,16 +232,16 @@ bool load_matrix()
 }
 
 //τυπώνει μενού με επιλόγές και ζητάει επιλογή απο τον χρήστη
-//επιστρέφει την επιλογή του χρήστη -1
+//επιστρέφει την επιλογή του χρήστη
 int menu(char* menu)
 {
-    printf(prime_menu);
-    printf("Επιλογή: ");
     int choice;
+    printf("%s", menu);
+    printf("Επιλογή: ");
+
     fflush(stdin);
     scanf("%d", &choice);
-
-    return choice-1;
+    return choice;
 }
 
 //τυπώνει τα στοιχεία ενος πίνακα επιλογής του χρήστη
@@ -245,7 +270,7 @@ void print_elements()
             {
                 double element;
                 fscanf(fp, "%lf", &element);
-                printf("%lf ", element);
+                printf("%15lf ", element);
             }
             printf("\n");
         }
@@ -264,13 +289,19 @@ int delete_matrixName(char* name)
     //άνοιγμα αρχειου σε write mode
     fp2 = fopen("copy.txt", "w");
 
-    while ((fscanf(fp1,"%s",matrixName))!= EOF)
-    {//&& ελεγχος οτι δεν ειναι σφάλμα της fscanf
+    while (fscanf(fp1,"%s",matrixName) != EOF)
+    {
 
         //εκτος απο την συστυχια για διαγραφη
         if (strcmp(name,matrixName) != 0)
             //αντέγραψε ολες τις υπόλοιπες γραμμες στο copy.txt
             fprintf(fp2, "%s\n",matrixName);
+    }
+
+    // ελεγχος οτι δεν ειναι σφάλμα της fscanf
+    if (!feof(fp1)){
+        printf("Παρουσιάστηκε σφάλμα\n");
+        return 1;
     }
 
     fclose(fp1);
@@ -281,6 +312,8 @@ int delete_matrixName(char* name)
 
     //μετονομασια του copy.txt σε available_matrix.txt
     rename("copy.txt", "available_matrix.txt");
+
+    printf("Διαγράφτηκε επιτυχώς\n");
 
     return 0;
 }
@@ -299,14 +332,115 @@ int delete_matrix()
     //προσθεσε την καταληξη ".txt"
     strcat(filename, ".txt");
 
-    if (remove(filename) == 0)
-        printf("Διαγράφτηκε επιτυχως\n");
-    else
-        printf("Αδυναμία διαγραφης\n");
+//    if (remove(filename) == 0)
+//        printf("Διαγράφτηκε επιτυχως\n");
+//    else
+//        printf("Αδυναμία διαγραφης\n");
 
     //για να μην προβάλεται στους διαθέσιμες συστοιχίες
     delete_matrixName(name);
 
     return 0;
 }
+struct matrix choose_matrix(char* m_identifier)
+{
+    printf("Επιλογή συστοιχίας %s", m_identifier);
+    int choice = menu("1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+
+    if (choice == 2)
+        return getmatrix();
+
+    struct matrix matrix;
+//τύπωσε τους διαθέσιμους πίνακες
+    show_matrixes();
+
+//επιλογή
+    char filename[50];
+    scanf("%s",filename);
+    strcat(filename,".txt");
+
+//ανοιξε αρχειο
+    FILE* fp;
+    fp = fopen(filename, "r");
+
+//επανέλαβε μέχρι input matches αναγνωριστικό
+    while(fp == NULL)
+    {
+        printf("Ο πίνακας δεν υπάρχει\n");
+        scanf("%s",filename);
+        strcat(filename,".txt");
+//??
+        fp = fopen(filename, "r");
+    }
+
+//δες διαστάσεις: γραμμές & στήλες
+    fscanf(fp,"%d", &matrix.rows);
+    fscanf(fp,"%d", &matrix.cols);
+
+//μετέφερε πίνακα απο το αρχειο
+    for (int i=0; i<matrix.rows; i++)
+        for (int j=0; j<matrix.cols; j++)
+            fscanf(fp, "%lf", &matrix.mat[i][j]);
+
+    return matrix;
+}
+
+
+struct matrix matrix_result(int operation){
+
+    //δημιουργία συστοιχίας αποτελέσματος
+    struct matrix matrixC;
+
+    //περιπτώσεις πράξεων
+    enum {sum=1, subtraction, multiplication};
+        switch(operation)
+    {
+        case sum:
+            //matrixC = πρόσθεση(choose_matrix("A"), choose_matrix("Β"));
+            break;
+        case subtraction:
+            //matrixC = αφαίρεση(choose_matrix("A"), choose_matrix("Β"));
+            break;
+        case multiplication:
+            //matrixC = πολ/σμος(choose_matrix("A"), choose_matrix("Β"));
+            break;
+        default:
+        printf("Η επίλογη αυτή δεν υπάρχει\n");
+    }
+
+    return matrixC;
+}
+
+
+
+//
+//bool matrix_result(struct matrix *matrixA, struct matrix *matrixB, struct matrix *matrixC){
+//
+//    //μενού πράξεων
+//    int op_choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
+//
+//    //δημιουργία πίνακα Α και Β
+//    //*matrixA = choose_matrix();
+//    //*matrixB = choose_matrix();
+//
+//    //περιπτώσεις πράξεων
+//    enum {sum=1, subtraction, multiplication};
+//
+//    switch(op_choice)
+//    {
+//        case sum:
+//            //matrixC = πρόσθεση(matrixA, matrixB)
+//            break;
+//        case subtraction:
+//            //matrixC = αφαίρεση(matrixA, matrixB)
+//            break;
+//        case multiplication:
+//            //matrixC = πολ/σμος(matrixA, matrixB)
+//            break;
+//        default:
+//        printf("Η επίλογη αυτή δεν υπάρχει\n");
+//    }
+//
+//    return true;
+//}
 

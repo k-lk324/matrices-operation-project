@@ -4,7 +4,7 @@
 #include <string.h>
 #define ROWS_MAX 100
 #define COLS_MAX 100
-#define ΝΟΤ_DEBUG
+#define NOT_DEBUG
 #define NOT_DEBUGSTR
 
 char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\

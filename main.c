@@ -78,6 +78,15 @@ int main()
             break;
         case vector_operations:
             //πράξεις διανυσμάτων
+            //printf("\n");
+//                int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Εσωτερικό\n4.Διανυσματικό γινόμενο\n\n");
+//                if (choice >= 1 && choice <=4){
+//                    struct matrix αποτελεσμα διανυσματων(choice)
+//
+//                    //προβολή αποτελέσματος
+//                }
+//                else
+//                    printf("H επιλογή δεν υπάρχει\n");
             break;
 
         case del:
@@ -171,6 +180,8 @@ bool save_matrix(){
 
 //προβάλει τους διαθέσιμους πίνακες
 bool show_matrixes(){
+
+    //άνοιγμα αρχείου σε read mode
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
 
@@ -184,21 +195,21 @@ bool show_matrixes(){
         return false;
     }
 
-    //κλεισιμο αρχειου
+    //κλείσιμο αρχείου
     fclose(AM);
 
     return true;
 }
 
-//φορτώνει δισδιάστατη συστυχία από αρχείο txt
+//φορτώνει δισδιάστατη συστοιχία από αρχείο txt
 bool load_matrix()
 {
-    // οδηγίες
-    printf("Για φόρτωση συστοιχίας από αρχείο πρέπει:\n");
-    printf("-Το αρχείο πρέπει να έχει επέκταση txt και στο ίδιο directory\n");
-    printf("-Ο αριθμός των γραμμών να αναγράφεται στην πρώτη γραμμή\n");
-    printf("-Ο αριθμός των στηλών να αναγράφεται στην δεύτερη γραμμή\n");
-    printf("-Μέγιστες δυνατές διαστάσεις: 100x100\n\n");
+    // οδηγίες για φόρτωση αρχείου
+    printf("\tOδηγίες:\n\
+-Το αρχείο πρέπει να έχει επέκταση txt και στο ίδιο directory\n\
+-Ο αριθμός των γραμμών να αναγράφεται στην πρώτη γραμμή\n\
+-Ο αριθμός των στηλών να αναγράφεται στην δεύτερη γραμμή\n\
+-Μέγιστες δυνατές διαστάσεις: 100x100\n\n");
 
     //εισαγωγη ονοματος συστοιχιας απο το χρηστη
     char matrixName[50];
@@ -213,20 +224,24 @@ bool load_matrix()
     FILE *fp;
     fp = fopen(filename,"r");
 
-    //αν υπάρξει αδυναμία άνοιγμα αρχείου
-    if (fp == NULL)
+    if (fp == NULL) //αν υπάρξει αδυναμία άνοιγμα αρχείου
         printf("Aδυναμία άνοιγμα αρχείου\n");
     else{
-    //αλλιως αποθήκευσε το όνομα της συστοιχίας στο available_matrix.txt
+    //κλείσιμο αρχείου συστοιχίας
+    fclose(fp);
+
+    //άνοιγμα αρχείου διαθέσιμων πινάκων
     FILE* am_file;
     am_file = fopen("available_matrix.txt", "a");
     if (am_file == NULL)
         printf("Αδυναμία φόρτωσης συστοιχίας\n");
 
-    fprintf (am_file,"%s\n",matrixName);
+    //συμπληρώνει το όνομα του πίνακα στους διαθέσιμους πίνακες
+    fprintf (am_file,"%s\n", matrixName);
+
+    //κλείσιμο αρχείου διαθέσιμων πίνακων
     fclose(am_file);
     }
-
     return 0;
 }
 
@@ -291,11 +306,10 @@ bool delete_matrixName(char* name)
 
     while (fscanf(am_fp,"%s",matrixName) != EOF)
     {
-        //εκτος απο την συστυχια για διαγραφη
+        //εκτος απο την συστοιχια για διαγραφη
         if (strcmp(name,matrixName) != 0){
             //αντέγραψε ολες τις υπόλοιπες γραμμες στο copy.txt
             fprintf(copy_fp, "%s\n",matrixName);
-            printf("%s\n", matrixName);
             }
         else
             printf("Ο πίνακας εντωπίστηκε\n");
@@ -326,7 +340,7 @@ int delete_matrix()
 {
     char name[50];
     show_matrixes();
-    printf ("Εισαγωγή συστυχίας για διαγραφή: ");
+    printf ("Εισαγωγή συστοιχίας για διαγραφή: ");
     scanf("%s", name);
 
     char filename[50];
@@ -335,9 +349,13 @@ int delete_matrix()
     //προσθεσε την καταληξη ".txt"
     strcat(filename, ".txt");
 
-    delete_matrixName(name);
+    //για να μην έμφανίζεται στους διαθέσιμους πίνακες
+    bool check1 = delete_matrixName(name);
+    //διαγραφή αρχείου
+    bool check2 = remove(filename) == 0;
 
-    if (remove(filename) == 0)
+    //έλεγχος διαγραφής
+    if (check1 && check2)
         printf("Διαγράφτηκε επιτυχως\n");
     else
         printf("Αδυναμία διαγραφης\n");

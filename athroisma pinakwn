@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define ROWS 10
+#define COLS 10
+
+void sum_matrix(int matrix1, int matrix2, int matrix3, int m, int n);
+
+int main(void)
+{
+	int matrix1[ROWS][COLS], matrix2[ROWS][COLS], matrix3[ROWS][COLS];
+ 	int i,j;
+ 	int M=2, N=3, K=2, L=3;
+ 	int a,b;
+ 	
+ 	/*ÅÉÓÏÄÏÓ ÄÉÁÓÔÁÓÅÙÍ ÁÐÏ ÔÏÍ ×ÑÇÓÔÇ*/
+ 	
+ 	
+	srand(time(NULL));
+	
+	 /*ÔÕ×ÁÉÁ ÁÑ×ÉÊÏÐÏÉÇÓÇ ÓÔÏÉ×ÅÉÙÍ*/
+	 
+	for(i=0; i<M; i++)
+	 	for(j=0; j<N; j++)
+		 	matrix1[i][j]=rand()%5;	
+		 	
+	for(i=0; i<K; i++)
+	 	for(j=0; j<L; j++)
+		 	matrix2[i][j]=rand()%5;
+	
+	
+	
+	sum_matrix( matrix1,  matrix2,  matrix3, M, N);
+	
+	printf("Matrix of sum:\n");
+		for(i=0; i<M; i++)
+    	{
+	 		for(j=0; j<N; j++)
+	 			printf(" %2d", matrix3[i][j]);
+	 	printf("\n");
+		}
+}
+
+void sum_matrix(int matrix1, int matrix2, int matrix3, int m, int n)
+{
+	int i,j;
+	
+	for(i=0; i<m; i++)
+    	{
+	 		for(j=0; j<n; j++)
+	 		{
+		 		matrix3[i][j]=matrix1[i][j]+matrix2[i][j];
+			}
+		}
+	
+	
+}
+

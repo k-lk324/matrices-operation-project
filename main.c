@@ -15,8 +15,14 @@ char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
 4.Διαγραφή συστοιχίας\n\
 5.Πράξεις πινάκων\n\
 6.Πράξεις διανυσμάτων\n\
-7.Έξοδος\n\n";
+7.Ορίζουσα\n\
+8.Ανάστροφος\n\
+9.Έξοδος\n\n";
 
+enum {createMatrix=1, show_matrix, ld_matrix, del,
+          matrix_operations, vector_operations, determinant, transpose, end};
+
+int menu(char* menu);
 
 struct matrix {
     double mat[ROWS_MAX][COLS_MAX];
@@ -24,24 +30,29 @@ struct matrix {
 };
 
 struct matrix getmatrix();
-bool save_matrix();
-bool show_matrixes();
-bool load_matrix();
-int menu(char* menu);
-void print_elements();
-bool delete_matrixName(char* name);
-int delete_matrix();
 struct matrix choose_matrix(char*);
 struct matrix matrix_result(int);
+void print_matrix(struct matrix);
+
+
+//συναρτήσεις για αλληλεπίδραση με αρχεία
+bool create_matrix();
+bool show_matrixes();
+bool load_matrix();
+void delete_matrix();
+void print_elements();
+bool delete_matrixName(char* name);
+
+//συναρτήσεις πράξεων
 struct matrix cofactor(struct matrix A, int i, int j);
 double det(struct matrix A);
+struct matrix sum_matrix(struct matrix A, struct matrix B);
+struct matrix substraction_matrix(struct matrix A, struct matrix B);
+struct matrix multiplication_matrix(struct matrix A, struct matrix B);
+struct matrix traspose(struct matrix A);
 
 
 int main() {
-    enum {create_matrix=1, show_matrix, ld_matrix, del,
-          matrix_operations, vector_operations, determinant, exit
-         };
-
     bool stop = false;
 
     //μέχρι ο χρήστης να επιλέξει να σταματήσει το πρόγραμμα
@@ -50,67 +61,67 @@ int main() {
 
         //επιλογές του αρχικού μενού
         switch(menu(prime_menu)) {
-            case create_matrix:
-                save_matrix();
+            case createMatrix:      //δημιουργία πίνακα
+                create_matrix();
                 break;
 
-            case show_matrix:
+            case show_matrix:       //προβολή διαθέσιμων πινάκων
                 show_matrixes();
                 print_elements();
                 break;
 
-            case ld_matrix:
+            case ld_matrix:         //φόρτωση πίνακα
                 load_matrix();
                 break;
 
-            case matrix_operations:
-                printf("\n");
-                int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
+            case matrix_operations: //πράξεις πινάκων
+            {
+                int choice = menu("\n1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
                 if(choice >= 1 && choice <=3) {
                     struct matrix result = matrix_result(choice);
-
                     //προβολή αποτελέσματος
-                    for(int i=0; i<result.rows; i++){
-                        for(int j=0; j<result.cols; j++)
-                            printf("%4.3lf ", result.mat[i][j]);
-                        printf("\n");
-                    }
+                    print_matrix(result);
                 }
                 else
-                    printf("H επιλογή δεν υπάρχει\n");
+                    puts("H επιλογή αυτή δεν υπάρχει");
+            }
                 break;
-            case vector_operations:
-                //πράξεις διανυσμάτων
+            case vector_operations: //πράξεις διανυσμάτων
                 //printf("\n");
 //                int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Εσωτερικό\n4.Διανυσματικό γινόμενο\n\n");
 //                if (choice >= 1 && choice <=4){
-//                    struct matrix αποτελεσμα διανυσματων(choice)
+//                   struct matrix matrixC = αποτελεσμα διανυσματων(choice)
 //
 //                    //προβολή αποτελέσματος
+//                      print_matrix(matrixC);
 //                }
 //                else
 //                    printf("H επιλογή δεν υπάρχει\n");
                 break;
 
-            case del:
+            case del:           //διαγραφή συστοιχίας
                 delete_matrix();
                 break;
 
-            case exit:
+            case end:           //έξοδος προγράμματος
                 stop = true;
                 break;
 
-            case determinant:
+            case determinant:   //ορίζουσα
             {
                 struct matrix A = choose_matrix("A");
                 if(A.rows == A.cols){
                     double d = det(A);
-                    printf("%.2lf\n", d);
+                    printf("Ορίζουσα: %.2lf\n", d);
                 }
                 else
                     puts("Ο πίνακας πρέπει να είναι τετραγωνικός");
             }
             break;
+
+            case transpose:     //ανάστροφος
+                print_matrix(traspose(choose_matrix("")));
+                break;
             default:
                 puts("Η επιλογή που βάλατε δεν υπάρχει");
         }
@@ -147,7 +158,7 @@ struct matrix getmatrix(){
 //δημιουργεί συστοιχία και αποθηκεύει σε txt file
 /*@επιστρέφει false αν δεν κατάφερει να ανοιξει το αρχείο
 true αν εκτελεστεί ο κώδικας κανονικά*/
-bool save_matrix() {
+bool create_matrix() {
 
     //αναγνωριστικο πίνακα
     printf("\nΟρισμός αναγνωριστικού: ");
@@ -345,8 +356,8 @@ bool delete_matrixName(char* name) {
     return true;
 }
 
-//διαγράφει αρχείο συστοιχίας
-int delete_matrix() {
+//διαγράφει συστοιχία
+void delete_matrix() {
     char name[50];
     show_matrixes();
     printf("Εισαγωγή συστοιχίας για διαγραφή: ");
@@ -368,30 +379,36 @@ int delete_matrix() {
         printf("Διαγράφτηκε επιτυχως\n");
     else
         printf("Αδυναμία διαγραφης\n");
-
-    return 0;
 }
+
+//
+//@
 struct matrix choose_matrix(char* m_identifier) {
     printf("Επιλογή συστοιχίας %s", m_identifier);
     int choice = menu("\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+
+    while (choice!=1 && choice!=2){
+        puts("Η επιλογή αυτή δεν υπάρχει");
+        choice = menu("\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+    }
 
     if(choice == 2)
         return getmatrix();
 
     struct matrix matrix;
-//τύπωσε τους διαθέσιμους πίνακες
+    //τύπωσε τους διαθέσιμους πίνακες
     show_matrixes();
 
-//επιλογή
+    //επιλογή
     char filename[50];
     scanf("%s", filename);
     strcat(filename, ".txt");
 
-//ανοιξε αρχειο
+    //ανοιξε αρχειο
     FILE* fp;
     fp = fopen(filename, "r");
 
-//επανέλαβε μέχρι input matches αναγνωριστικό
+    //επανέλαβε μέχρι input matches αναγνωριστικό
     while(fp == NULL) {
         printf("Ο πίνακας δεν υπάρχει\n");
         scanf("%s", filename);
@@ -399,11 +416,11 @@ struct matrix choose_matrix(char* m_identifier) {
         fp = fopen(filename, "r");
     }
 
-//δες διαστάσεις: γραμμές & στήλες
+    //δες διαστάσεις: γραμμές & στήλες
     fscanf(fp, "%d", &matrix.rows);
     fscanf(fp, "%d", &matrix.cols);
 
-//μετέφερε πίνακα απο το αρχειο
+    //μετέφερε πίνακα απο το αρχειο
     for(int i=0; i<matrix.rows; i++)
         for(int j=0; j<matrix.cols; j++)
             fscanf(fp, "%lf", &matrix.mat[i][j]);
@@ -420,22 +437,24 @@ struct matrix matrix_result(int operation) {
     //περιπτώσεις πράξεων
     enum {sum=1, subtraction, multiplication};
     switch(operation) {
-        case sum:
-            //matrixC = πρόσθεση(choose_matrix("A"), choose_matrix("Β"));
-            break;
-        case subtraction:
-            //matrixC = αφαίρεση(choose_matrix("A"), choose_matrix("Β"));
-            break;
-        case multiplication:
-            //matrixC = πολ/σμος(choose_matrix("A"), choose_matrix("Β"));
-            break;
-        default:
-            printf("Η επίλογη αυτή δεν υπάρχει\n");
+    case sum:
+        matrixC = sum_matrix(choose_matrix("A"), choose_matrix("Β"));
+        break;
+    case subtraction:
+        matrixC = substraction_matrix(choose_matrix("A"), choose_matrix("Β"));
+        break;
+    case multiplication:
+        matrixC = multiplication_matrix(choose_matrix("A"), choose_matrix("Β"));
+        break;
+    default:
+        puts("Η επίλογη αυτή δεν υπάρχει");
     }
 
     return matrixC;
 }
 
+//βρίσκει τον συμπαράγοντα πίνακα Αxy
+//@επιστρέφει structure με τον συμπαράγοντα
 struct matrix cofactor(struct matrix A, int x, int y) {
 #ifdef DEBUG
     puts("αρχη της cofactor");
@@ -444,34 +463,25 @@ struct matrix cofactor(struct matrix A, int x, int y) {
     int n = A.rows;
     struct matrix B;
     B.rows = B.cols = n-1;
-
-    int p=0, q =0;
+    int a=0, b=0;
 
     for(int i=0; i<n; i++) {
         for(int j=0; j<n; j++) {
             if(i!= x && j!= y) {
-                B.mat[p][q] = A.mat[i][j];
-                if(++q == n-1) {
-                    p++;
-                    q=0;
+                B.mat[a][b] = A.mat[i][j];
+                if(++b == n-1) {
+                    a++;
+                    b=0;
                 }
             }
         }
-        puts("");//
     }
-
-#ifdef DEBUG
-    for(int x=0; x<n-1; x++) {
-        for(int y=0; y<n-1; y++)
-            printf("%3.2lf ", B.mat[x][y]);
-        puts("");
-    }
-#endif // DEBUG
 
     return B;
 }
 
-
+//υπολογίζει ορίζουσα ενός πίνακα
+//@επιστρέφει την ορίζουσα
 double det(struct matrix A) {
 #ifdef DEBUG
     printf("\nΑΡΧΗ ΤΗΣ DEF\nδιαστάσεις: %d\n", n);
@@ -490,4 +500,87 @@ double det(struct matrix A) {
         }
     }
     return *pd;
+}
+
+
+
+//προσθέτει 2 πίνακες
+//@επιστρέφει structure με τον πίνακα αθροίσματος
+struct matrix sum_matrix(struct matrix A, struct matrix B) {
+
+    struct matrix C;
+
+    if(A.rows == B.rows && A.cols == B.cols) {
+        C.rows = A.rows;
+        C.cols = A.cols;
+
+        for(int i=0; i<A.rows; i++)
+            for(int j=0; j<A.rows; j++)
+                C.mat[i][j]=A.mat[i][j]+ B.mat[i][j];
+    }
+
+    return C;
+}
+
+//αφαιρεί 2 πίνακες
+//@επιστρέφει structure με τον πίνακα διαφοράς
+struct matrix substraction_matrix(struct matrix A, struct matrix B) {
+    struct matrix C;
+
+    if(A.rows == B.rows && A.cols == B.cols) {
+        C.rows = A.rows;
+        C.cols = A.cols;
+
+        for(int i=0; i<A.rows; i++)
+            for(int j=0; j<A.cols; j++)
+                C.mat[i][j]=A.mat[i][j]- B.mat[i][j];
+    }
+
+    return C;
+}
+
+//πολλαπλασιαζει 2 πίνακες
+//@επιστρέφει structure με τον πίνακα γινόμενο
+struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
+    struct matrix C;
+
+    if(A.cols == B.rows) {
+        int k = A.cols;
+        C.rows = A.rows;
+        C.cols = B.cols;
+
+        int sum = 0;
+        for(int i=0; i<C.rows; i++) {
+            for(int j=0; j<C.cols; j++) {
+                for(int l=0; l<k; l++)
+                    sum += A.mat[i][l]*B.mat[l][j];
+                C.mat[i][j]=sum;
+                sum=0;
+            }
+        }
+    }
+    return C;
+}
+
+//βρίσκει τον ανάστροφο ενός πίνακα
+//@επιστρέφει structure με τον ανάστροφο
+struct matrix traspose(struct matrix A){
+    struct matrix At;
+    At.rows = A.cols;
+    At.cols = A.rows;
+
+    for(int i=0; i<A.rows; i++){
+        for(int j=0; j<A.cols; j++){
+            At.mat[j][i] = A.mat[i][j];
+        }
+    }
+    return At;
+}
+
+void print_matrix(struct matrix A){
+    for(int i=0; i<A.rows; i++){
+        for(int j=0; j<A.cols; j++)
+            printf("%.3lf ",A.mat[i][j]);
+        puts("");
+    }
 }

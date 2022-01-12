@@ -17,13 +17,6 @@ char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
 6.Πράξεις διανυσμάτων\n\
 7.Έξοδος\n\n";
 
-
-//δυναμεις
-//αντιστροφο
-//οριζουσα
-//system clear και πιο interactive menu
-
-
 struct matrix{
     double mat[ROWS_MAX][COLS_MAX];
     int rows,cols;

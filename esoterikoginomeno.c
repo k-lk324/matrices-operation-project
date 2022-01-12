@@ -1,5 +1,4 @@
-int main()
-{
+
 
 double esgin(struct matrix A, struct matrix B)
 

@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#define ROWS_MAX 100
-#define COLS_MAX 100
+#include <math.h>
+#define ROWS_MAX 20
+#define COLS_MAX 20
 #define NOT_DEBUG
 #define NOT_DEBUGSTR
 
@@ -15,6 +16,12 @@ char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
 5.Πράξεις πινάκων\n\
 6.Πράξεις διανυσμάτων\n\
 7.Έξοδος\n\n";
+
+
+//δυναμεις
+//αντιστροφο
+//οριζουσα
+//system clear και πιο interactive menu
 
 
 struct matrix{
@@ -32,6 +39,9 @@ bool delete_matrixName(char* name);
 int delete_matrix();
 struct matrix choose_matrix(char*);
 struct matrix matrix_result(int);
+struct matrix cofactor(struct matrix A, int i, int j);
+double det(struct matrix A);
+
 
 int main()
 {
@@ -69,7 +79,7 @@ int main()
                     //προβολή αποτελέσματος
                     for (int i=0; i<result.rows; i++){
                         for (int j=0; j<result.cols; j++)
-                            printf("%15lf ", result.mat[i][j]);
+                            printf("%4.3lf ", result.mat[i][j]);
                         printf("\n");
                     }
                 }
@@ -97,6 +107,12 @@ int main()
             stop = true;
             break;
 
+        case 8://determinant:
+            {
+            double d = det(choose_matrix("A"));
+            printf("%.3lf\n", d);
+        }
+            break;
         default:
             printf("Η επιλογή που βάλατε δεν υπάρχει\n");
         }
@@ -105,17 +121,17 @@ int main()
         for (int i=0; i<3; i++)
             printf("\n");
     }
-
     return 0;
 }
 
 //ζητάει απο χρήστη πίνακα: διαστάσεις και στοιχεία
+//@επιστρέφει τον πίνακα
 struct matrix getmatrix()
 {
     struct matrix y;
 
     //διαστάσεις
-    printf("\nΟρισμός διαστάσεων\nΠροσοχή! Μέγιστες διαστάσεις: 100x100\n\nΓραμμές: ");
+    printf("\nΟρισμός διαστάσεων\nΠροσοχή! Μέγιστες διαστάσεις: %dx%d\n\nΓραμμές: ", ROWS_MAX, COLS_MAX);
     scanf("%d", &y.rows);
     printf("Στήλες: ");
     scanf("%d", &y.cols);
@@ -129,13 +145,12 @@ struct matrix getmatrix()
         for (int j=0; j<y.cols; j++)
         scanf("%lf", &y.mat[i][j]);
     }
-
     return y;
 }
 
 //δημιουργεί συστυχία και αποθηκεύει σε txt file
-//επιστρέφει false αν δεν κατάφερει να ανοιξει το αρχείο
-//επιστρέφει true αν εκτελεστεί ο κώδικας κανονικά
+/*@επιστρέφει false αν δεν κατάφερει να ανοιξει το αρχείο
+true αν εκτελεστεί ο κώδικας κανονικά*/
 bool save_matrix(){
 
     //αναγνωριστικο πίνακα
@@ -246,7 +261,7 @@ bool load_matrix()
 }
 
 //τυπώνει μενού με επιλόγές και ζητάει επιλογή απο τον χρήστη
-//επιστρέφει την επιλογή του χρήστη
+//@επιστρέφει την επιλογή του χρήστη
 int menu(char* menu)
 {
     int choice;
@@ -365,7 +380,7 @@ int delete_matrix()
 struct matrix choose_matrix(char* m_identifier)
 {
     printf("Επιλογή συστοιχίας %s", m_identifier);
-    int choice = menu("1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+    int choice = menu("\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
 
     if (choice == 2)
         return getmatrix();
@@ -389,7 +404,6 @@ struct matrix choose_matrix(char* m_identifier)
         printf("Ο πίνακας δεν υπάρχει\n");
         scanf("%s",filename);
         strcat(filename,".txt");
-//??
         fp = fopen(filename, "r");
     }
 
@@ -429,4 +443,60 @@ struct matrix matrix_result(int operation){
     }
 
     return matrixC;
+}
+
+ struct matrix cofactor(struct matrix A, int x, int y){
+     #ifdef DEBUG
+     puts("αρχη της cofactor");
+     #endif // DEBUG
+
+    int n = A.rows;
+    struct matrix B;
+    B.rows = B.cols = n-1;
+
+    int p=0, q =0;
+
+    for (int i=0; i<n; i++){
+        for (int j=0; j<n; j++){
+            if (i!= x && j!= y){
+                B.mat[p][q] = A.mat[i][j];
+                if (++q == n-1){
+                    p++;
+                    q=0;
+                }
+            }
+        }
+        puts("");//
+    }
+
+    #ifdef DEBUG
+    for (int x=0; x<n-1; x++){
+        for (int y=0; y<n-1; y++)
+            printf("%3.2lf ", B.mat[x][y]);
+        puts("");
+    }
+    #endif // DEBUG
+
+    return B;
+}
+
+
+double det(struct matrix A) {
+#ifdef DEBUG
+    printf("\nΑΡΧΗ ΤΗΣ DEF\nδιαστάσεις: %d\n", n);
+#endif // DEBUG
+    int n = A.rows;
+    double d=0;
+    double *pd = &d;
+
+    if(n == 1)
+        *pd = A.mat[0][0];
+    else {
+        for(int j = 0; j<n; j++) {
+            int sign =pow(-1, (j+1)+1);
+            printf("sign: %d\n", sign);
+            *pd += sign * A.mat[0][j] * det(cofactor(A, 0, j));
+        }
+    }
+    return *pd;
 }

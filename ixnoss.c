@@ -5,7 +5,7 @@ double ixnos(struct matrix A)
 
 if(A.rows == A.cols ) {
 
-
+     ixnos=0;
      double k;
 
         for(int i=0; i<A.rows; i++)

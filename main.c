@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include "prakseis.h"
 #define ROWS_MAX 20
 #define COLS_MAX 20
 #define NOT_DEBUG
@@ -24,11 +25,7 @@ enum {createMatrix=1, show_matrix, ld_matrix, del,
 
 int menu(char* menu);
 
-struct matrix {
-    double mat[ROWS_MAX][COLS_MAX];
-    int rows, cols;
-};
-
+struct matrix define_matrix();
 struct matrix getmatrix();
 struct matrix choose_matrix(char*);
 struct matrix matrix_result(int);
@@ -62,21 +59,29 @@ int main() {
         //επιλογές του αρχικού μενού
         switch(menu(prime_menu)) {
             case createMatrix:      //δημιουργία πίνακα
-                create_matrix();
+
+                if (!create_matrix())
+                    puts("Παρουσιάστηκε σφάλμα");
                 break;
 
             case show_matrix:       //προβολή διαθέσιμων πινάκων
-                show_matrixes();
-                print_elements();
+
+                if (show_matrixes())
+                    print_elements();
+                else
+                    puts("Παρουσιάστηκε σφάλμα");
                 break;
 
             case ld_matrix:         //φόρτωση πίνακα
-                load_matrix();
+                if (!load_matrix())
+                    printf("Aδυναμία άνοιγμα αρχείου\n");
                 break;
 
             case matrix_operations: //πράξεις πινάκων
             {
                 int choice = menu("\n1.Πρόσθεση\n2.Aφαίρεση\n3.Πολλαπλασιασμός\n\n");
+
+                //αν η επιλογή ειναι δεκτή
                 if(choice >= 1 && choice <=3) {
                     struct matrix result = matrix_result(choice);
                     //προβολή αποτελέσματος
@@ -87,16 +92,16 @@ int main() {
             }
                 break;
             case vector_operations: //πράξεις διανυσμάτων
-                //printf("\n");
-//                int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Εσωτερικό\n4.Διανυσματικό γινόμενο\n\n");
-//                if (choice >= 1 && choice <=4){
-//                   struct matrix matrixC = αποτελεσμα διανυσματων(choice)
-//
-//                    //προβολή αποτελέσματος
-//                      print_matrix(matrixC);
-//                }
-//                else
-//                    printf("H επιλογή δεν υπάρχει\n");
+                printf("\n");
+                int choice = menu("1.Πρόσθεση\n2.Aφαίρεση\n3.Εσωτερικό\n4.Διανυσματικό γινόμενο\n\n");
+                if (choice >= 1 && choice <=4){
+                  // struct matrix result = αποτελεσμα διανυσματων(choice)
+
+                    //προβολή αποτελέσματος
+                     // print_matrix(result);
+                }
+                else
+                    printf("H επιλογή δεν υπάρχει\n");
                 break;
 
             case del:           //διαγραφή συστοιχίας
@@ -134,9 +139,9 @@ int main() {
 }
 
 //ζητάει απο χρήστη πίνακα: διαστάσεις και στοιχεία
-//@επιστρέφει τον πίνακα
+//@επιστρέφει τον structure με τον πίνακα
 struct matrix getmatrix(){
-    struct matrix y;
+    struct matrix y = define_matrix();
 
     //διαστάσεις
     printf("\nΟρισμός διαστάσεων\nΠροσοχή! Μέγιστες διαστάσεις: %dx%d\n\nΓραμμές: ", ROWS_MAX, COLS_MAX);
@@ -160,23 +165,47 @@ struct matrix getmatrix(){
 true αν εκτελεστεί ο κώδικας κανονικά*/
 bool create_matrix() {
 
-    //αναγνωριστικο πίνακα
-    printf("\nΟρισμός αναγνωριστικού: ");
     char name[50];
-    scanf("%s", name);
-    fflush(stdin);
+    bool unique_name = true;
 
-#ifndef DEBUGSTR
+    //άνοιγμα αρχείου διαθέσιμων συστοιχιών σε read mode
+    FILE* am_fp;
+    am_fp = fopen("available_matrix.txt", "a");
+    if(am_fp == NULL)
+        return false;
 
-    //δημιουργία πίνακα
-    struct matrix x =getmatrix();
+    while (!unique_name){
+        //αναγνωριστικο πίνακα
+        printf("\nΟρισμός αναγνωριστικού: ");
+        scanf("%s", name);
+        fflush(stdin);
 
-    //κατέγραψε το όνομα του πίνακα για να μπορει να παρουσιαστεί ως διαθέσιμος
+    #ifndef DEBUGSTR
+
+        //έλεγχος οτι δεν έχει οριστεί πίνακας με το ίδιο αναγνωριστικό
+        char matrixName[50];
+        while(fscanf(am_fp, "%s", matrixName) != EOF) {
+            if(strcmp(name, matrixName) == 0) {
+                printf("Το αναγνωριστικό %s χρησιμοποιείται ήδη", name);
+                unique_name = false;
+            }
+            else unique_name = true;
+        }
+    }
+    //έλεγχος fscanf
+
+    //κλεισιμο αρχειου διαθέσιμων συστοιχιών
+    fclose(am_fp);
+
+    //άνοιγμα αρχειου διαθεσιμων συστοιχιων σε append mode
     FILE* am_file;
     am_file = fopen("available_matrix.txt", "a");
-    if(am_file == NULL) return false;
+    if(am_file == NULL)
+        return false;
 
+    //καταγραφή αναγνωριστικου
     fprintf(am_file, "%s\n", name);
+    //κλεισιμο αρχειου διαθέσιμων συστοιχιών
     fclose(am_file);
 
     //πρόσθεσε την καταληξη ".txt" στο αναγνωριστικο
@@ -186,6 +215,9 @@ bool create_matrix() {
     FILE *file;
     file = fopen(name, "w");
     if(file == NULL) return false;
+
+    //δημιουργία πίνακα
+    struct matrix x =getmatrix();
 
     //πρώτες 2 σειρες τύπωσε τις διαστάσεις
     fprintf(file, "%d\n%d\n", x.rows, x.cols);
@@ -197,33 +229,30 @@ bool create_matrix() {
         }
         fprintf(file, "\n");
     }
+    //κλεισιμο αρχείο συστοιχίας
     fclose(file);
 #endif // DEBUGSTR
     return true;
 }
 
 //προβάλει τους διαθέσιμους πίνακες
+//@επιστρέφει true αν εκτελεστει επιτυχώς ο κώδικας και false αν παρουσιαστεί σφάλμα
 bool show_matrixes() {
-
     //άνοιγμα αρχείου σε read mode
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
 
     if (AM == NULL)
-    {
-        printf("Παρουσιάστηκε σφάλμα\n");
         return false;
-    }
 
     char matrixName[50];
     //επανέλαβε μέχρι το τέλος του αρχείου
     while((fscanf(AM, "%s", matrixName))!= EOF)
         printf("%s\n", matrixName);
 
-    if(!feof(AM)) {
-        printf("Παρουσιάστηκε σφάλμα\n");
+    //έλεγχος οτι δεν ειναι σφαλμα της scanf
+    if(!feof(AM))
         return false;
-    }
 
     //κλείσιμο αρχείου
     fclose(AM);
@@ -232,6 +261,7 @@ bool show_matrixes() {
 }
 
 //φορτώνει δισδιάστατη συστοιχία από αρχείο txt
+//@επιστρέφει true αν εκτελεστεί επιτυχώς
 bool load_matrix() {
     // οδηγίες για φόρτωση αρχείου
     printf("\tOδηγίες:\n\
@@ -253,9 +283,10 @@ bool load_matrix() {
     FILE *fp;
     fp = fopen(filename, "r");
 
-    if(fp == NULL)  //αν υπάρξει αδυναμία άνοιγμα αρχείου
-        printf("Aδυναμία άνοιγμα αρχείου\n");
-    else {
+    if(fp == NULL){  //αν υπάρξει αδυναμία άνοιγμα αρχείου
+        return false;
+    }
+
         //κλείσιμο αρχείου συστοιχίας
         fclose(fp);
 
@@ -270,8 +301,8 @@ bool load_matrix() {
 
         //κλείσιμο αρχείου διαθέσιμων πίνακων
         fclose(am_file);
-    }
-    return 0;
+
+    return true;
 }
 
 //τυπώνει μενού με επιλόγές και ζητάει επιλογή απο τον χρήστη
@@ -395,7 +426,7 @@ struct matrix choose_matrix(char* m_identifier) {
     if(choice == 2)
         return getmatrix();
 
-    struct matrix matrix;
+    struct matrix matrix = define_matrix();
     //τύπωσε τους διαθέσιμους πίνακες
     show_matrixes();
 
@@ -432,7 +463,7 @@ struct matrix choose_matrix(char* m_identifier) {
 struct matrix matrix_result(int operation) {
 
     //δημιουργία συστοιχίας αποτελέσματος
-    struct matrix matrixC;
+    struct matrix matrixC = define_matrix();
 
     //περιπτώσεις πράξεων
     enum {sum=1, subtraction, multiplication};
@@ -461,7 +492,7 @@ struct matrix cofactor(struct matrix A, int x, int y) {
 #endif // DEBUG
 
     int n = A.rows;
-    struct matrix B;
+    struct matrix B = define_matrix();
     B.rows = B.cols = n-1;
     int a=0, b=0;
 
@@ -508,7 +539,7 @@ double det(struct matrix A) {
 //@επιστρέφει structure με τον πίνακα αθροίσματος
 struct matrix sum_matrix(struct matrix A, struct matrix B) {
 
-    struct matrix C;
+    struct matrix C = define_matrix();
 
     if(A.rows == B.rows && A.cols == B.cols) {
         C.rows = A.rows;
@@ -518,6 +549,10 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
             for(int j=0; j<A.rows; j++)
                 C.mat[i][j]=A.mat[i][j]+ B.mat[i][j];
     }
+    else {
+        C.invalid= true;
+        puts("Οι πίνακες δεν έχουν τις ίδιες διαστάσεις");
+    }
 
     return C;
 }
@@ -525,7 +560,7 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
 //αφαιρεί 2 πίνακες
 //@επιστρέφει structure με τον πίνακα διαφοράς
 struct matrix substraction_matrix(struct matrix A, struct matrix B) {
-    struct matrix C;
+    struct matrix C = define_matrix();
 
     if(A.rows == B.rows && A.cols == B.cols) {
         C.rows = A.rows;
@@ -535,6 +570,7 @@ struct matrix substraction_matrix(struct matrix A, struct matrix B) {
             for(int j=0; j<A.cols; j++)
                 C.mat[i][j]=A.mat[i][j]- B.mat[i][j];
     }
+    else C.invalid = true;
 
     return C;
 }
@@ -542,7 +578,7 @@ struct matrix substraction_matrix(struct matrix A, struct matrix B) {
 //πολλαπλασιαζει 2 πίνακες
 //@επιστρέφει structure με τον πίνακα γινόμενο
 struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
-    struct matrix C;
+    struct matrix C = define_matrix();
 
     if(A.cols == B.rows) {
         int k = A.cols;
@@ -559,13 +595,15 @@ struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
             }
         }
     }
+    else C.invalid = true;
+
     return C;
 }
 
 //βρίσκει τον ανάστροφο ενός πίνακα
 //@επιστρέφει structure με τον ανάστροφο
 struct matrix traspose(struct matrix A){
-    struct matrix At;
+    struct matrix At = define_matrix();
     At.rows = A.cols;
     At.cols = A.rows;
 
@@ -578,9 +616,21 @@ struct matrix traspose(struct matrix A){
 }
 
 void print_matrix(struct matrix A){
-    for(int i=0; i<A.rows; i++){
-        for(int j=0; j<A.cols; j++)
-            printf("%.3lf ",A.mat[i][j]);
-        puts("");
+    if (!A.invalid){
+        for(int i=0; i<A.rows; i++){
+            for(int j=0; j<A.cols; j++)
+                printf("%.3lf ",A.mat[i][j]);
+            puts("");
+        }
     }
+    else
+        puts("Ο πίνακας δεν μπορεί να προβληθεί");
+}
+
+//αρχικοποίηση συστοιχίας
+struct matrix define_matrix(){
+    struct matrix y;
+    y.invalid=false;
+    y.rows=y.cols = 0;
+    return y;
 }

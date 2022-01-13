@@ -3,7 +3,7 @@
 double esgin(struct matrix A, struct matrix B){
 
      if(A.rows == B.rows && A.cols == B.cols) {
-     double p=0.0;
+     double p=0; //εξηγηση στο ixnos.c
 
         for(int i=0; i<A.rows; i++)
                 for(int j=0; j<A.cols; j++)

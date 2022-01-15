@@ -9,9 +9,19 @@ struct matrix {
     int rows, cols;
 };
 
-struct mattix adj(struct matrix A);
-struct matrix inverse(struct matrix A);
+struct matrix adj(struct matrix A);
+struct matrix inverse_matrix(struct matrix A);
 struct matrix exp_matrix(struct matrix A, int power);
+double ixnos(struct matrix A);
+struct matrix transpose_matrix();
+struct matrix multiplication_matrix();
+double det(struct matrix);
+struct matrix cofactor(struct matrix, int, int);
+struct matrix subtraction_matrix(struct matrix A, struct matrix B);
+struct matrix sum_matrix(struct matrix A, struct matrix B);
+struct matrix vector_product(struct matrix A, struct matrix B);
+double esgin(struct matrix, struct matrix);
+struct matrix vector_product(struct matrix A, struct matrix B);
 
 
 #endif // PRAKSEIS

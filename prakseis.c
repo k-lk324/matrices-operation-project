@@ -52,7 +52,7 @@ struct matrix exp_matrix(struct matrix A, int power) {
     if(A.cols == A.rows) {
         for(int i = 0; i < power; i++)
             y = multiplication_matrix(y, A);
-    } else{
+    } else {
         y.invalid = true;
         puts("O πίνακας δεν είναι τετραγωνικός");
     }
@@ -71,8 +71,7 @@ double ixnos(struct matrix A) {
                     trace += A.mat[i][j];
             }
         }
-    }
-    else{
+    } else {
         A.invalid = true;
         puts("Ο πίνακας δεν είναι τετραγωνικός");
     }
@@ -94,15 +93,14 @@ double esgin(struct matrix A, struct matrix B) {
 
 //βρίσκει τον ανάστροφο ενός πίνακα
 //@επιστρέφει structure με τον ανάστροφο
-struct matrix transpose_matrix(struct matrix A){
+struct matrix transpose_matrix(struct matrix A) {
     struct matrix At = define_matrix();
     At.rows = A.cols;
     At.cols = A.rows;
 
-    for(int i=0; i<A.rows; i++){
-        for(int j=0; j<A.cols; j++){
+    for(int i = 0; i < A.rows; i++) {
+        for(int j = 0; j < A.cols; j++)
             At.mat[j][i] = A.mat[i][j];
-        }
     }
     return At;
 }
@@ -140,11 +138,10 @@ struct matrix subtraction_matrix(struct matrix A, struct matrix B) {
         C.rows = A.rows;
         C.cols = A.cols;
 
-        for(int i=0; i<A.rows; i++)
-            for(int j=0; j<A.cols; j++)
-                C.mat[i][j]=A.mat[i][j]- B.mat[i][j];
-    }
-    else C.invalid = true;
+        for(int i = 0; i < A.rows; i++)
+            for(int j = 0; j < A.cols; j++)
+                C.mat[i][j] = A.mat[i][j] - B.mat[i][j];
+    } else C.invalid = true;
 
     return C;
 }
@@ -159,12 +156,11 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
         C.rows = A.rows;
         C.cols = A.cols;
 
-        for(int i=0; i<A.rows; i++)
-            for(int j=0; j<A.rows; j++)
-                C.mat[i][j]=A.mat[i][j]+ B.mat[i][j];
-    }
-    else {
-        C.invalid= true;
+        for(int i = 0; i < A.rows; i++)
+            for(int j = 0; j < A.rows; j++)
+                C.mat[i][j] = A.mat[i][j] + B.mat[i][j];
+    } else {
+        C.invalid = true;
         puts("Οι πίνακες δεν έχουν τις ίδιες διαστάσεις");
     }
 
@@ -203,16 +199,16 @@ struct matrix cofactor(struct matrix A, int x, int y) {
 
     int n = A.rows;
     struct matrix B = define_matrix();
-    B.rows = B.cols = n-1;
-    int a=0, b=0;
+    B.rows = B.cols = n - 1;
+    int a = 0, b = 0;
 
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<n; j++) {
-            if(i!= x && j!= y) {
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            if(i != x && j != y) {
                 B.mat[a][b] = A.mat[i][j];
-                if(++b == n-1) {
+                if(++b == n - 1) {
                     a++;
-                    b=0;
+                    b = 0;
                 }
             }
         }
@@ -236,5 +232,5 @@ struct matrix vector_product(struct matrix A, struct matrix B) {
         puts("Το εξωτερικό γινόμενο επιτρέπεται μόνο με διανύσματα 3 διαστάσεων");
         C.invalid = true;
     }
-        return C;
-    }
+    return C;
+}

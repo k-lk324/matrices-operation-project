@@ -137,6 +137,8 @@ struct matrix subtraction_matrix(struct matrix A, struct matrix B) {
     if(A.rows == B.rows && A.cols == B.cols) {
         C.rows = A.rows;
         C.cols = A.cols;
+        if(C.cols == 1)
+            C.vect = true;
 
         for(int i = 0; i < A.rows; i++)
             for(int j = 0; j < A.cols; j++)
@@ -155,6 +157,8 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
     if(A.rows == B.rows && A.cols == B.cols) {
         C.rows = A.rows;
         C.cols = A.cols;
+        if(C.cols == 1)
+            C.vect = true;
 
         for(int i = 0; i < A.rows; i++)
             for(int j = 0; j < A.rows; j++)
@@ -219,6 +223,7 @@ struct matrix cofactor(struct matrix A, int x, int y) {
 struct matrix vector_product(struct matrix A, struct matrix B) {
     //δημιουργία πίνακα αποτελέσματος
     struct matrix C = define_matrix();
+    C.vect = true;
     C.cols = 1;
     C.rows = 3;
 
@@ -229,7 +234,7 @@ struct matrix vector_product(struct matrix A, struct matrix B) {
         C.mat[1][0] = A.mat[2][0] * B.mat[0][0] - A.mat[0][0] * B.mat[2][0];
         C.mat[2][0] = A.mat[0][0] * B.mat[1][0] - A.mat[1][0] * B.mat[0][0];
     } else {
-        puts("Το εξωτερικό γινόμενο επιτρέπεται μόνο με διανύσματα 3 διαστάσεων");
+        puts("Το εξωτερικό γινόμενο επιτρέπει μόνο διανύσματα 3 διαστάσεων");
         C.invalid = true;
     }
     return C;

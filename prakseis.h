@@ -5,8 +5,10 @@
 
 struct matrix {
     bool invalid;
-    double mat[ROWS_MAX][COLS_MAX];
+    bool vect;
     int rows, cols;
+    double mat[ROWS_MAX][COLS_MAX];
+
 };
 
 struct matrix adj(struct matrix A);

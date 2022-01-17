@@ -11,8 +11,11 @@
 
 struct matrix define_matrix();
 
-//υπολογίζει τον προσαρτημένο ενος πίνακα
-//@επιστρέφει structure με τον προσαρτημένο
+/* Υπολογισμός προσαρτημένου πίνακα:
+ *
+ * Παράμετρος struct matrix A: πίνακας του οποίου υπολογίζεται ο προσαρτημένος
+ * Επιστρέφει: structure με τον προσαρτημένο πίνακα
+ */
 struct matrix adj(struct matrix A) {
     struct matrix y = define_matrix();
     y.cols = A.cols;
@@ -25,12 +28,15 @@ struct matrix adj(struct matrix A) {
     return transpose_matrix(y);
 }
 
-//υπολογιζει τον αντιστροφο ενος πίνακα
-//@επιστρέφει structure με τον αντίστροφο
+/* Υπολογισμός αντίστροφου πίνακα:
+ * Έλεγχος αν ο πίνακας που δώθηκε είναι αντιστρέψιμος
+ *
+ * Παράμετρος struct matrix A: τετραγωνικός πίνακας του οποίου υπολογίζεται ο αντίστροφος
+ * Επιστρέφει: structure με τον αντίστροφο πίνακα
+ */
 struct matrix inverse_matrix(struct matrix A) {
     struct matrix X = define_matrix();
-    X.cols = A.rows;
-    X.rows = A.cols;
+    X.cols = X.rows = A.rows;
 
     if(det(A) == 0) {
         puts("Ο πίνακας δεν ειναι αντιστρέψιμος");
@@ -38,14 +44,19 @@ struct matrix inverse_matrix(struct matrix A) {
     } else {
         for(int i = 0; i < X.rows; i++)
             for(int j = 0; j < X.rows; j++)
+                //Α^-1 = (1/|Α|) * adj(A)
                 X.mat[i][j] = (1 / det(A)) * adj(A).mat[i][j];
     }
     return X;
 }
 
-
-//υπολογίζει εναν τετραγωνικο πίνακα εις την κάποια δύναμη
-//@επιστρεφει τον εκθετικο
+/* Δυνάμεις πινάκων:
+ * Πολλαπλασιασμός τετραγωνικού πίνακα με τον ευατό του ν φορές
+ *
+ * Παράμετρος struct matrix A: πίνακας του οποίου υπολογίζεται ο αντίστροφος
+ * Παράμετρος int power: ακέραιος που δηλώνει την δύναμη που θα υψωθεί ο πίνακας
+ * Επιστρέφει: structure με τον εκθετικό πίνακα
+ */
 struct matrix exp_matrix(struct matrix A, int power) {
     struct matrix y = A;
 
@@ -60,7 +71,13 @@ struct matrix exp_matrix(struct matrix A, int power) {
     return y;
 }
 
-//υπολογίζει ίχνος πίνακα
+/* Ίχνος πίνακα:
+ * Έλεγχος αν ο πίνακας είναι τετραγωνικός
+ * Πρόσθεση στοιχείων της κύριας διαγωνίου
+ *
+ * Παράμετρος struct matrix A: structure με πίνακα
+ * Επιστρέφει: το ίχνος ως δεκαδικό αριθμό
+ */
 double ixnos(struct matrix A) {
 
     double trace = 0;
@@ -72,13 +89,13 @@ double ixnos(struct matrix A) {
             }
         }
     } else {
-        A.invalid = true;
         puts("Ο πίνακας δεν είναι τετραγωνικός");
     }
     return trace;
 }
 
-
+//υπολογιζει το εσωτερικο γινομενο 2 διανυσματων
+//@επιστρεφει το εσωτερικο γινομενο
 double esgin(struct matrix A, struct matrix B) {
 
     double p = 0;
@@ -171,7 +188,6 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
     return C;
 }
 
-
 //υπολογίζει ορίζουσα ενός πίνακα
 //@επιστρέφει την ορίζουσα
 double det(struct matrix A) {
@@ -220,6 +236,8 @@ struct matrix cofactor(struct matrix A, int x, int y) {
     return B;
 }
 
+//υπολογίζει εξωτερικό γινόμενο 2 διανυσματων
+//@επιστρέφει structure με το εξωτερικο γινομενο
 struct matrix vector_product(struct matrix A, struct matrix B) {
     //δημιουργία πίνακα αποτελέσματος
     struct matrix C = define_matrix();

@@ -94,12 +94,17 @@ double ixnos(struct matrix A) {
     return trace;
 }
 
-//υπολογιζει το εσωτερικο γινομενο 2 διανυσματων
-//@επιστρεφει το εσωτερικο γινομενο
+/* Εσωτερικό γινόμενο:
+ * Έλεγχος αν τα διανύσματα έχουν τις ίδιες διαστάσεις
+ * Υπολογισμός εσωτερικού γινομένου δύο διανυσμάτων Α και Β
+ *
+ * Παράμετρος struct matrix A: structure με διάνυσμα
+ * Παράμετρος struct matrix Β: structure με διάνυσμα
+ * Επιστρέφει: το εσωτερικό γινόμενο ως δεκαδικό αριθμό
+ */
 double esgin(struct matrix A, struct matrix B) {
-
     double p = 0;
-    if(A.rows == B.rows && A.cols == B.cols) {
+    if(A.rows == B.rows) {
         for(int i = 0; i < A.rows; i++)
             p += A.mat[i][0] * B.mat[i][0];
     } else
@@ -108,8 +113,12 @@ double esgin(struct matrix A, struct matrix B) {
     return p;
 }
 
-//βρίσκει τον ανάστροφο ενός πίνακα
-//@επιστρέφει structure με τον ανάστροφο
+/* Υπολογισμός ανάστροφος ενός πίνακα:
+ * Αναστροφή γραμμών και στηλών
+ *
+ * Παράμετρος struct matrix A: structure με πίνακα
+ * Επιστρέφει: structure με τον ανάστροφο
+ */
 struct matrix transpose_matrix(struct matrix A) {
     struct matrix At = define_matrix();
     At.rows = A.cols;
@@ -122,8 +131,13 @@ struct matrix transpose_matrix(struct matrix A) {
     return At;
 }
 
-//πολλαπλασιαζει 2 πίνακες
-//@επιστρέφει structure με τον πίνακα γινόμενο
+/* Πολλαπλασιασμός 2 πινάκων:
+ * Έλεγχος αν ορίζεται ο πολλαπλασιασμός
+ *
+ * Παράμετρος struct matrix A: structure με πίνακα
+ * Παράμετρος struct matrix Β: structure με πίνακα
+ * Επιστρέφει: structure με τον πίνακα γινομένου
+ */
 struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
     struct matrix C = define_matrix();
 
@@ -141,13 +155,21 @@ struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
                 sum = 0;
             }
         }
-    } else C.invalid = true;
+    } else {
+    C.invalid = true;
+    puts("O πολλαπλασιασμός δεν ορίζεται");
+    }
 
     return C;
 }
 
-//αφαιρεί 2 πίνακες
-//@επιστρέφει structure με τον πίνακα διαφοράς
+/* Aφαίρεση 2 πινάκων:
+ * Έλεγχος αν ορίζεται η αφαίρεση
+ *
+ * Παράμετρος struct matrix A: structure με πίνακα
+ * Παράμετρος struct matrix Β: structure με πίνακα
+ * Επιστρέφει: structure με τον πίνακα διαφοράς
+ */
 struct matrix subtraction_matrix(struct matrix A, struct matrix B) {
     struct matrix C = define_matrix();
 
@@ -165,8 +187,13 @@ struct matrix subtraction_matrix(struct matrix A, struct matrix B) {
     return C;
 }
 
-//προσθέτει 2 πίνακες
-//@επιστρέφει structure με τον πίνακα αθροίσματος
+/* Πρόσθεση 2 πινάκων:
+ * Έλεγχος αν ορίζεται η πρόσθεση
+ *
+ * Παράμετρος struct matrix A: structure με πίνακα
+ * Παράμετρος struct matrix Β: structure με πίνακα
+ * Επιστρέφει: structure με τον πίνακα αθροίσματος
+ */
 struct matrix sum_matrix(struct matrix A, struct matrix B) {
 
     struct matrix C = define_matrix();
@@ -188,8 +215,11 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
     return C;
 }
 
-//υπολογίζει ορίζουσα ενός πίνακα
-//@επιστρέφει την ορίζουσα
+/* Yπολογισμός ορίζουσας:
+ *
+ * Παράμετρος struct matrix Α: structure με τετραγωνικό πίνακα
+ * Επιστρέφει: την ορίζουσα ως δεκαδικό
+ */
 double det(struct matrix A) {
 #ifdef DEBUG
     printf("\nΑΡΧΗ ΤΗΣ DET\n");
@@ -210,14 +240,20 @@ double det(struct matrix A) {
     return *pd;
 }
 
-//βρίσκει τον συμπαράγοντα πίνακα Αxy
-//@επιστρέφει structure με τον συμπαράγοντα
+/* Συμπαράγοντας Αxy:
+ *
+ * Παράμετρος struct matrix Α: structure με τετραγωνικό πίνακα
+ * Παράμετρος int x: ακέραιος που δηλώνει την γραμμή που θα αφαιρεθεί
+ * Παράμετρος int y: ακέραιος που δηλώνει την στήλη που θα αφαιρεθεί
+ * Επιστρέφει: structure με τον πίνακα αθροίσματος
+ */
 struct matrix cofactor(struct matrix A, int x, int y) {
 #ifdef DEBUG
     puts("αρχη της cofactor");
 #endif // DEBUG
 
     int n = A.rows;
+    //δημιουργία πίνακα αποτελέσματος
     struct matrix B = define_matrix();
     B.rows = B.cols = n - 1;
     int a = 0, b = 0;
@@ -236,8 +272,13 @@ struct matrix cofactor(struct matrix A, int x, int y) {
     return B;
 }
 
-//υπολογίζει εξωτερικό γινόμενο 2 διανυσματων
-//@επιστρέφει structure με το εξωτερικο γινομενο
+/* Eξωτερικό γινόμενο:
+ * Έλεγχος ότι τα διανύσματα ανήκουν στον Διανυσματικό Χώρο R^3
+ *
+ * Παράμετρος struct matrix Α: structure με διάνυσμα
+ * Παράμετρος struct matrix Β: structure με διάνυσμα
+ * Επιστρέφει: structure με τον διάνυσμα αποτελέσματος
+ */
 struct matrix vector_product(struct matrix A, struct matrix B) {
     //δημιουργία πίνακα αποτελέσματος
     struct matrix C = define_matrix();

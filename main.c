@@ -60,10 +60,10 @@ void print_matrix(struct matrix);
 
 //συναρτήσεις για αλληλεπίδραση με αρχεία
 bool create_matrix();
-bool show_matrixes();
+char *show_matrixes();
 bool load_matrix();
 void delete_matrix();
-void print_elements();
+void print_elements(char*);
 bool delete_matrixName(char* name);
 
 int main() {
@@ -87,10 +87,7 @@ int main() {
 
             case showMatrix:
                 //προβολή διαθέσιμων πινάκων
-                if(show_matrixes())
-                    print_elements();
-                else
-                    puts("Παρουσιάστηκε σφάλμα");
+                print_elements(show_matrixes());
                 break;
 
             case ld_matrix:
@@ -107,7 +104,6 @@ int main() {
                     struct matrix result = matrix_operations(choice);
                     //προβολή αποτελέσματος
                     print_matrix(result);
-
                 }
                 break;
             case vectorOperations:
@@ -156,11 +152,14 @@ struct matrix getmatrix(bool vect) {
         if(!vect) {
             printf("\nΟρισμός διαστάσεων\nΠροσοχή! Μέγιστες διαστάσεις: %dx%d\n\nΓραμμές: ", ROWS_MAX, COLS_MAX);
             scanf("%d", &y.rows);
+            y.rows = abs(y.rows);
             printf("Στήλες: ");
             scanf("%d", &y.cols);
+            y.cols = abs(y.cols);
         } else {
             printf("\nΟρισμός διαστάσεων\nΜέγιστες διαστάσεις: %d \n", ROWS_MAX);
             scanf("%d", &y.rows);
+            y.rows = abs(y.rows);
             y.cols = 1;
 
         }
@@ -266,28 +265,42 @@ bool create_matrix() {
  *
  * Επιστρέφει: false αν παρουσιαστεί σφάλμα και true αν εκτελεστεί επιτυχώς
  */
-bool show_matrixes() {
+char *show_matrixes() {
+    //array με τα αναγνωριστικά των διαθέσιμων συστοιχιών
+    static char matrix_catalog[50][50];
+
     //άνοιγμα αρχείου σε read mode
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
     if(AM == NULL)
-        return false;
+        puts("Σφάλμα άνοιγμα αρχείου");
 
     char matrixName[50];
+    int cnt = 0 ;
     //επανέλαβε μέχρι το τέλος του αρχείου
-    while((fscanf(AM, "%s", matrixName)) != EOF)
-        printf("%s\n", matrixName);
+    for(int i = 0;(fscanf(AM, "%s", matrixName)) != EOF; i++){
+        cnt++;
+        strcpy(matrix_catalog[i], matrixName);
+        printf("%d.%s\n", i+1, matrixName);
+    }
 
     //έλεγχος ότι δεν είναι σφάλμα της scanf
     if(!feof(AM)){
         fclose(AM);
-        return false;
+        puts("Παρουσιάστηκε σφάλμα");
+    }
+
+    //εισαγωγή επιλογής από τον χρήστη
+    int matrix_choice = menu("\n");
+    while (matrix_choice > cnt){
+        puts("Η επιλογή δεν υπάρχει");
+        matrix_choice = menu("\n");
     }
 
     //κλείσιμο αρχείου
     fclose(AM);
 
-    return true;
+    return matrix_catalog[matrix_choice-1];
 }
 
 /* Φόρτωση πίνακα:
@@ -353,17 +366,14 @@ int menu(char *menu) {
 
     fflush(stdin);
     scanf("%d", &choice);
-    return choice;
+    return abs(choice);
 }
 
 /* Προβολή στοιχείων συστοιχίας από αρχείο:
  * Εισαγωγή αναγνωριστικού συστοιχίας από τον χρήστη,
  * άνοιγμα αρχείου συστοιχίας και προβολή στοιχείων
  */
-void print_elements() {
-    printf("\nΕπιλογή πίνακα για προβολή: ");
-    char name[50];
-    scanf("%s", name);
+void print_elements(char *name) {
     strcat(name, ".txt");
 
     FILE *fp;
@@ -442,10 +452,7 @@ bool delete_matrixName(char *name) {
  * Διαγραφή αναγνωριστικού και διαγραφή αρχείου συστοιχίας
  */
 void delete_matrix() {
-    char name[50];
-    show_matrixes();
-    printf("Εισαγωγή συστοιχίας για διαγραφή: ");
-    scanf("%s", name);
+    char *name = show_matrixes();
 
     char filename[50];
     strcpy(filename, name);
@@ -486,13 +493,10 @@ struct matrix choose_matrix(char *m_identifier, bool vect) {
         return getmatrix(vect);
 
     struct matrix matrix = define_matrix();
-    //προβολή διαθέσιμων πινάκων
-    show_matrixes();
 
-    //επιλογή
-    char filename[50];
-    scanf("%s", filename);
-    strcat(filename, ".txt");
+    //επιλογή από διαθέσιμους πίνακες
+    char *filename = show_matrixes();
+    strcat(filename,".txt");
 
     //άνοιξε αρχείο σε read mode
     FILE* fp;
@@ -508,7 +512,9 @@ struct matrix choose_matrix(char *m_identifier, bool vect) {
 
     //διαστάσεις: γραμμές & στήλες
     fscanf(fp, "%d", &matrix.rows);
+    matrix.rows = abs(matrix.rows); //σε περίπτωση που είναι αρνητική τιμή
     fscanf(fp, "%d", &matrix.cols);
+    matrix.cols = abs(matrix.cols); //σε περίπτωση που είναι αρνητική τιμή
 
     //μεταφορά στοιχείων συστοιχίας από το αρχείο σε πίνακα σε structure
     for(int i = 0; i < matrix.rows; i++)

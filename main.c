@@ -47,6 +47,7 @@ char *vectOp_menu = "\n\
 //περιπτώσεις πράξεων διανυσμάτων
 enum vectorOp {sum2 = 1, subtraction2, dotProduct, vectorProduct, backToHome2};
 
+void startMsg();
 int menu(char* menu);
 
 struct matrix define_matrix();
@@ -65,16 +66,8 @@ void delete_matrix();
 void print_elements();
 bool delete_matrixName(char* name);
 
-//συναρτήσεις πράξεων
-//struct matrix cofactor(struct matrix A, int i, int j);
-//double det(struct matrix A);
-//struct matrix sum_matrix(struct matrix A, struct matrix B);
-//struct matrix subtraction_matrix(struct matrix A, struct matrix B);
-//struct matrix multiplication_matrix(struct matrix A, struct matrix B);
-//struct matrix traspose(struct matrix A);
-
-
 int main() {
+    startMsg();
     bool stop = false;
 
     //μέχρι ο χρήστης να επιλέξει να σταματήσει το πρόγραμμα
@@ -197,36 +190,36 @@ bool create_matrix() {
     bool unique_name = true;
 
     //άνοιγμα αρχείου διαθέσιμων συστοιχιών σε read mode
-    FILE* am_fp;
-    am_fp = fopen("available_matrix.txt", "a");
-    if(am_fp == NULL)
+    FILE* amReadFp;
+    amReadFp = fopen("available_matrix.txt", "r");
+    if(amReadFp == NULL)
         return false;
 
-    //Eισαγωγή αναγνωριστικού από τον χρήστη
-    while(!unique_name) {
+    do {
+        unique_name = true;
+        rewind(amReadFp);
+
+        //Eισαγωγή αναγνωριστικού από τον χρήστη
         printf("\nΟρισμός αναγνωριστικού: ");
         scanf("%s", name);
         fflush(stdin);
 
-        //έλεγχος οτι δεν έχει οριστεί πίνακας με το ίδιο αναγνωριστικό
-        char matrixName[50];
-        while(fscanf(am_fp, "%s", matrixName) != EOF) {
+        //επανάληψη μέχρι το τέλος του αρχείου
+        while(!feof(amReadFp)) {
+            char matrixName[50];
+            fscanf(amReadFp, "%s", matrixName);
+
+            //αν το αναγνωριστικό που δώθηκε ισούται με ήδη υπάρχον αναγνωριστικό
             if(strcmp(name, matrixName) == 0) {
                 printf("Το αναγνωριστικό %s χρησιμοποιείται ήδη", name);
                 unique_name = false;
-            } else
-                unique_name = true;
+                break;
+            }
         }
-    }
-    //έλεγχος της fscanf
-    if (!feof(am_fp)){
-        fclose(am_fp);
-        return false;
-    }
-
+    } while(!unique_name);
 
     //κλείσιμο αρχείου διαθέσιμων συστοιχιών
-    fclose(am_fp);
+    fclose(amReadFp);
 
     //άνοιγμα αρχείου διαθέσιμων συστοιχιών σε append mode
     FILE* am_file;
@@ -239,7 +232,7 @@ bool create_matrix() {
     //κλείσιμο αρχείου διαθέσιμων συστοιχιών
     fclose(am_file);
 
-    //πρόσθεσε την κατάληξη ".txt" στο αναγνωριστικό
+    //πρόσθεσε την κατάληξη txt στο αναγνωριστικό
     strcat(name, ".txt");
 
     //δημιουργία αρχείου "αναγνωριστικο".txt σε write mode
@@ -250,6 +243,7 @@ bool create_matrix() {
 
     //δημιουργία πίνακα
     struct matrix x = getmatrix(false);
+    //αν είναι διάνυσμα
     if(x.cols == 1)
         x.vect = true;
 
@@ -267,7 +261,7 @@ bool create_matrix() {
 }
 
 /* Προβολή διαθέσιμων πινάκων:
- * Άνοιγμα αρχείου διαθέσιμων πινάκων
+ * ’νοιγμα αρχείου διαθέσιμων πινάκων
  * και προβολή των αναγνωριστικών πινάκων
  *
  * Επιστρέφει: false αν παρουσιαστεί σφάλμα και true αν εκτελεστεί επιτυχώς
@@ -304,13 +298,13 @@ bool show_matrixes() {
  */
 bool load_matrix() {
     //οδηγίες για φόρτωση αρχείου
-    printf("\tOδηγίες:\n\
+    printf("\nOδηγίες:\n\
 -Το αρχείο πρέπει να έχει επέκταση txt και στο ίδιο directory\n\
 -Ο αριθμός των γραμμών να αναγράφεται στην πρώτη γραμμή\n\
 -Ο αριθμός των στηλών να αναγράφεται στην δεύτερη γραμμή\n\
 -Μέγιστες δυνατές διαστάσεις: %dx%d\n\n", ROWS_MAX, COLS_MAX);
 
-    //εισαγωγή αναγνωριστικού συστοιχίας απο το χρήστη
+    //εισαγωγή αναγνωριστικού συστοιχίας από το χρήστη
     char matrixName[50];
     char filename[50];
     printf("Εισαγωγή αναγνωριστικού συστοιχίας (χωρίς επέκταση txt): ");
@@ -341,6 +335,7 @@ bool load_matrix() {
 
     //κλείσιμο αρχείου διαθέσιμων πίνακων
     fclose(am_file);
+    puts("Επιτυχής φόρτωση συστοιχίας");
     return true;
 }
 
@@ -710,3 +705,12 @@ struct matrix define_matrix() {
     y.rows = y.cols = 0;
     return y;
 }
+
+/* Προβολή αρχικού μηνύματος:
+ * Προβoλή ονομάτων των συγγραφέων του προγράμματος
+ */
+void startMsg() {
+    puts("Το παρόν πρόγραμμα γράφτηκε από την Αικατερίνη Παπαγιαννίτση και Μαρία Μηλιούση\n\
+ως εργασία του μαθήματος Δομημμένος Προγραμματισμός, έτος: 2021-2022\n");
+    }
+

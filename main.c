@@ -25,16 +25,17 @@ enum home {createMatrix = 1, showMatrix, ld_matrix, del, matrixOperations, vecto
 char *matrixOp_menu = "\n\
 1.Πρόσθεση\n\
 2.Aφαίρεση\n\
-3.Πολλαπλασιασμός\n\
-4.Ορίζουσα\n\
-5.Αντίστροφος\n\
-6.Ανάστροφος\n\
-7.Δυνάμεις πινάκων\n\
-8.Ίχνος\n\
-9.Επιστροφή στο αρχικό μενού\n\n";
+3.Πολλαπλασιασμός πινάκων\n\
+4.Πολλαπλασιασμός με αριθμό\n\
+5.Ορίζουσα\n\
+6.Αντίστροφος\n\
+7.Ανάστροφος\n\
+8.Δυνάμεις πινάκων\n\
+9.Ίχνος\n\
+10.Επιστροφή στο αρχικό μενού\n\n";
 
 //περιπτώσεις πράξεων πινάκων
-enum matrixOp {sum = 1, subtraction, multiplication, determinant, inverse, transpose, power, trace, backToHome};
+enum matrixOp {sum = 1, subtraction, multiplicationMatrix, multiplicationNumber, determinant, inverse, transpose, degree, trace, backToHome};
 
 //μενού για πράξεις διανυσμάτων
 char *vectOp_menu = "\n\
@@ -272,8 +273,10 @@ char *show_matrixes() {
     //άνοιγμα αρχείου σε read mode
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
-    if(AM == NULL)
+    if(AM == NULL){
         puts("Σφάλμα άνοιγμα αρχείου");
+        return "";
+    }
 
     char matrixName[50];
     int cnt = 0 ;
@@ -496,6 +499,7 @@ struct matrix choose_matrix(char *m_identifier, bool vect) {
 
     //επιλογή από διαθέσιμους πίνακες
     char *filename = show_matrixes();
+    if (strcmp(filename,"") != 0){
     strcat(filename,".txt");
 
     //άνοιξε αρχείο σε read mode
@@ -512,14 +516,16 @@ struct matrix choose_matrix(char *m_identifier, bool vect) {
 
     //διαστάσεις: γραμμές & στήλες
     fscanf(fp, "%d", &matrix.rows);
-    matrix.rows = abs(matrix.rows); //σε περίπτωση που είναι αρνητική τιμή
+    matrix.rows = abs(matrix.rows); //σε περίπτωση που δώθηκε αρνητική τιμή
     fscanf(fp, "%d", &matrix.cols);
-    matrix.cols = abs(matrix.cols); //σε περίπτωση που είναι αρνητική τιμή
+    matrix.cols = abs(matrix.cols); //σε περίπτωση που δώθηκε αρνητική τιμή
 
     //μεταφορά στοιχείων συστοιχίας από το αρχείο σε πίνακα σε structure
     for(int i = 0; i < matrix.rows; i++)
         for(int j = 0; j < matrix.cols; j++)
             fscanf(fp, "%lf", &matrix.mat[i][j]);
+    } else
+        matrix.invalid = true;
 
     return matrix;
 }
@@ -553,13 +559,23 @@ struct matrix matrix_operations(int operation) {
                 struct matrix B = choose_matrix("Β", false);
                 matrixC = subtraction_matrix(A, B);
             }
-        case multiplication:
-            //πολλαπλασιασμός
+            break;
+        case multiplicationMatrix:
+            //πολλαπλασιασμός πινακων
             {
-                //πολσμος με αριθμο ή πινακα επιλογη
                 struct matrix A = choose_matrix("A", false);
                 struct matrix B = choose_matrix("Β", false);
                 matrixC = multiplication_matrix(A, B);
+            }
+            break;
+
+        case multiplicationNumber:
+            //πολλαπλασιασμός με αριθμό
+            {
+                double number = 0;
+                struct matrix A = choose_matrix("", false);
+                puts("\nΕισαγωγή αριθμού: ");
+                matrixC = multiply_byNumber(A, number);
             }
             break;
 
@@ -589,7 +605,7 @@ struct matrix matrix_operations(int operation) {
             //ανάστροφος
             matrixC = transpose_matrix(choose_matrix("", false));
             break;
-        case power:
+        case degree:
             //δυνάμεις πινάκων
             {
                 int power = 0;
@@ -690,6 +706,7 @@ struct matrix vector_operations(int operation) {
  * Παράμετρος struct matrix A: structure με συστοιχία για προβολή
  */
 void print_matrix(struct matrix A) {
+    printf("\n");
     if(!A.invalid) {
         for(int i = 0; i < A.rows; i++) {
             for(int j = 0; j < A.cols; j++)

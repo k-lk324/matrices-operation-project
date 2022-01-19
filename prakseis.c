@@ -23,7 +23,7 @@ struct matrix adj(struct matrix A) {
 
     for(int i = 0; i < y.rows; i++) {
         for(int j = 0; j < y.cols; j++)
-            y.mat[i][j] = pow(-1, (i + 1) + (j + 1)) * A.mat[i][j];
+            y.mat[i][j] = pow(-1, (i + 1) + (j + 1)) * det(cofactor(A,i,j));
     }
     return transpose_matrix(y);
 }
@@ -233,7 +233,6 @@ double det(struct matrix A) {
     else {
         for(int j = 0; j < n; j++) {
             int sign = pow(-1, (j + 1) + 1);
-            printf("sign: %d\n", sign);
             *pd += sign * A.mat[0][j] * det(cofactor(A, 0, j));
         }
     }
@@ -277,7 +276,7 @@ struct matrix cofactor(struct matrix A, int x, int y) {
  *
  * Παράμετρος struct matrix Α: structure με διάνυσμα
  * Παράμετρος struct matrix Β: structure με διάνυσμα
- * Επιστρέφει: structure με τον διάνυσμα αποτελέσματος
+ * Επιστρέφει: structure με το διάνυσμα αποτελέσματος
  */
 struct matrix vector_product(struct matrix A, struct matrix B) {
     //δημιουργία πίνακα αποτελέσματος
@@ -297,4 +296,20 @@ struct matrix vector_product(struct matrix A, struct matrix B) {
         C.invalid = true;
     }
     return C;
+}
+
+/* Πολλαπλασιασμός πίνακα με αριθμό:
+ * Πολλαπλασιασμός κάθε στοιχείου του πίνακα με σταθερό αριθμό
+ *
+ * Παράμετρος struct matrix Α: structure με πίνακα
+ * Παράμετρος double c: σταθερός αριθμός
+ * Επιστρέφει: structure με τον πολλαπλασιασμένο πίνακα
+ */
+struct matrix multiply_byNumber(struct matrix A, double c){
+    for (int i =0; i<A.rows; i++){
+        for (int j =0; j<A.cols; j++){
+            A.mat[i][j] = A.mat[i][j] * c;
+        }
+    }
+    return A;
 }

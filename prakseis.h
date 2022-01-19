@@ -24,6 +24,7 @@ struct matrix sum_matrix(struct matrix A, struct matrix B);
 struct matrix vector_product(struct matrix A, struct matrix B);
 double esgin(struct matrix, struct matrix);
 struct matrix vector_product(struct matrix A, struct matrix B);
+struct matrix multiply_byNumber(struct matrix, double);
 
 
 #endif // PRAKSEIS

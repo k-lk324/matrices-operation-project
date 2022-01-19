@@ -94,7 +94,7 @@ int main() {
             case ld_matrix:
                 //φόρτωση πίνακα
                 if(!load_matrix())
-                    printf("Aδυναμία άνοιγμα αρχείου\n");
+                    printf("Αδυναμία ανοίγματος αρχείου\n");
                 break;
 
             case matrixOperations:
@@ -274,7 +274,7 @@ char *show_matrixes() {
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
     if(AM == NULL){
-        puts("Σφάλμα άνοιγμα αρχείου");
+        puts("Αδυναμία ανοίγματος αρχείου");
         return "";
     }
 

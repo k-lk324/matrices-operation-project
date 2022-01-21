@@ -7,4 +7,4 @@
 
 ## Οδηγίες
 - Το πρόγραμμα αρχίζει από το αρχικό μενού οπου γραφεις τον αριθμο απο την επιλογη που θες να διαλεξεις
-![image](https://user-images.githubusercontent.com/97043061/150506911-6a22ce2c-c8a7-4894-86dd-65874266b8e0.png)
+![image](https://user-images.githubusercontent.com/97043061/150507535-1505374a-5cd1-4762-814a-806d5c2a1e81.png)

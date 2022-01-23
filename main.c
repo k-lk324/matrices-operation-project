@@ -48,10 +48,10 @@ char *vectOp_menu = "\n\
 //περιπτώσεις πράξεων διανυσμάτων
 enum vectorOp {sum2 = 1, subtraction2, dotProduct, vectorProduct, backToHome2};
 
-void startMsg();
+void startMsg(void);
 int menu(char* menu);
 
-struct matrix define_matrix();
+struct matrix define_matrix(void);
 struct matrix getmatrix(bool);
 struct matrix choose_matrix(char*, bool);
 struct matrix matrix_operations(int);
@@ -60,14 +60,14 @@ void print_matrix(struct matrix);
 
 
 //συναρτήσεις για αλληλεπίδραση με αρχεία
-bool create_matrix();
-char *show_matrixes();
-bool load_matrix();
-void delete_matrix();
+bool save_matrix(struct matrix x);
+char *show_matrixes(void);
+bool load_matrix(void);
+void delete_matrix(void);
 void print_elements(char*);
 bool delete_matrixName(char* name);
 
-int main() {
+int main(void) {
     startMsg();
     bool stop = false;
 
@@ -80,7 +80,7 @@ int main() {
             case createMatrix:
                 //δημιουργία πίνακα
                 {
-                    bool error = !create_matrix();
+                    bool error = !save_matrix(getmatrix(false));
                     if(error)
                         puts("Παρουσιάστηκε σφάλμα");
                 }
@@ -88,7 +88,11 @@ int main() {
 
             case showMatrix:
                 //προβολή διαθέσιμων πινάκων
-                print_elements(show_matrixes());
+                {
+                    char *matrixForShow = show_matrixes();
+                    if(*matrixForShow != '\0')
+                        print_elements(matrixForShow);
+                }
                 break;
 
             case ld_matrix:
@@ -101,10 +105,25 @@ int main() {
                 //πράξεις πινάκων
                 {
                     int choice = menu(matrixOp_menu);
-
                     struct matrix result = matrix_operations(choice);
                     //προβολή αποτελέσματος
                     print_matrix(result);
+
+                    fflush(stdin);
+                    //αποθήκευση
+                    char answer = '\0';
+                    if(!result.invalid) {
+                        do {
+                            printf("Αποθήκευση συστοιχίας[y/n];");
+                            answer = getchar();
+
+                            if(answer == 'y')
+                                save_matrix(result);
+                            else if(answer == 'n') {}
+                            else
+                                puts("Δεν υπάρχει αυτή η επιλογή");
+                        } while(answer != 'n' && answer != 'y');
+                    }
                 }
                 break;
             case vectorOperations:
@@ -115,6 +134,21 @@ int main() {
 
                     //προβολή αποτελέσματος
                     print_matrix(result);
+
+                    //αποθήκευση
+                    char answer = '\0';
+                    if(!result.invalid) {
+                        do {
+                            printf("Αποθήκευση συστοιχίας[y/n];");
+                            answer = getchar();
+
+                            if(answer == 'y')
+                                save_matrix(result);
+                            else if(answer == 'n') {}
+                            else
+                                puts("Δεν υπάρχει αυτή η επιλογή");
+                        } while(answer != 'n' && answer != 'y');
+                    }
                 }
                 break;
 
@@ -177,15 +211,17 @@ struct matrix getmatrix(bool vect) {
     return y;
 }
 
-/* Δημιουργία Πίνακα:
- * Εισαγωγή πίνακα από χρήστη
- * Αποθήκευση πίνακα σε αρχείο
+/* Αποθήκευση Πίνακα σε αρχείο:
+ * Εισαγωγή αναγνωριστικού από τον χρήστη και
+ * έλεγχος αν είχε χρησιμοποιηθεί ξανά
+ * Καταγραφή αναγνωριστικού στις διαθέσιμες συστοιχίες
+ * Δημιουγία αρχείου συστοιχίας και συμπλήρωση διαστάσεων και τιμών
  *
- * Παράμετρος bool vect: αληθές όταν ζητείται μονοδιάστατος πίνακας (διάνυσμα)
+ * Παράμετρος struct matrix x: stucture με την συστοιχίας
+ * που πρόκειται να αποθηκευτεί
  * Επιστρέφει: false αν παρουσιαστεί σφάλμα και true αν εκτελεστεί επιτυχώς
  */
-bool create_matrix() {
-
+bool save_matrix(struct matrix x) {
     char name[50];
     bool unique_name = true;
 
@@ -209,7 +245,7 @@ bool create_matrix() {
             char matrixName[50];
             fscanf(amReadFp, "%s", matrixName);
 
-            //αν το αναγνωριστικό που δώθηκε ισούται με ήδη υπάρχον αναγνωριστικό
+            //αν το αναγνωριστικό που δώθηκε είναι ίδιο με ήδη υπάρχον αναγνωριστικό
             if(strcmp(name, matrixName) == 0) {
                 printf("Το αναγνωριστικό %s χρησιμοποιείται ήδη", name);
                 unique_name = false;
@@ -241,12 +277,6 @@ bool create_matrix() {
     if(file == NULL)
         return false;
 
-    //δημιουργία πίνακα
-    struct matrix x = getmatrix(false);
-    //αν είναι διάνυσμα
-    if(x.cols == 1)
-        x.vect = true;
-
     //πρώτες 2 σειρές τύπωσε τις διαστάσεις
     fprintf(file, "%d\n%d\n", x.rows, x.cols);
 
@@ -266,44 +296,49 @@ bool create_matrix() {
  *
  * Επιστρέφει: false αν παρουσιαστεί σφάλμα και true αν εκτελεστεί επιτυχώς
  */
-char *show_matrixes() {
+char *show_matrixes(void) {
     //array με τα αναγνωριστικά των διαθέσιμων συστοιχιών
     static char matrix_catalog[50][50];
 
     //άνοιγμα αρχείου σε read mode
     FILE* AM;
     AM = fopen("available_matrix.txt", "r");
-    if(AM == NULL){
+    if(AM == NULL) {
         puts("Αδυναμία ανοίγματος αρχείου");
         return "";
     }
 
     char matrixName[50];
     int cnt = 0 ;
+    printf("0. Ακύρωση\n");
     //επανέλαβε μέχρι το τέλος του αρχείου
-    for(int i = 0;(fscanf(AM, "%s", matrixName)) != EOF; i++){
+    for(int i = 0; (fscanf(AM, "%s", matrixName)) != EOF; i++) {
         cnt++;
         strcpy(matrix_catalog[i], matrixName);
-        printf("%d.%s\n", i+1, matrixName);
+        printf("%d.%s\n", i + 1, matrixName);
     }
 
     //έλεγχος ότι δεν είναι σφάλμα της scanf
-    if(!feof(AM)){
+    if(!feof(AM)) {
         fclose(AM);
         puts("Παρουσιάστηκε σφάλμα");
     }
 
     //εισαγωγή επιλογής από τον χρήστη
     int matrix_choice = menu("\n");
-    while (matrix_choice > cnt){
+
+    while(matrix_choice > cnt) {
         puts("Η επιλογή δεν υπάρχει");
         matrix_choice = menu("\n");
     }
 
+    if(matrix_choice == 0)
+        return "\0";
+
     //κλείσιμο αρχείου
     fclose(AM);
 
-    return matrix_catalog[matrix_choice-1];
+    return matrix_catalog[matrix_choice - 1];
 }
 
 /* Φόρτωση πίνακα:
@@ -312,7 +347,7 @@ char *show_matrixes() {
  *
  * Επιστρέφει: false αν παρουσιαστεί σφάλμα και true αν εκτελεστεί επιτυχώς
  */
-bool load_matrix() {
+bool load_matrix(void) {
     //οδηγίες για φόρτωση αρχείου
     printf("\nOδηγίες:\n\
 -Το αρχείο πρέπει να έχει επέκταση txt και στο ίδιο directory\n\
@@ -454,25 +489,27 @@ bool delete_matrixName(char *name) {
  * Εισαγωγή αναγνωριστικού συστοιχίας για διαγραφή από το χρήστη
  * Διαγραφή αναγνωριστικού και διαγραφή αρχείου συστοιχίας
  */
-void delete_matrix() {
+void delete_matrix(void) {
     char *name = show_matrixes();
+    if(*name != '\0'){
 
-    char filename[50];
-    strcpy(filename, name);
+        char filename[50];
+        strcpy(filename, name);
 
-    //προσθήκη κατάληξης ".txt"
-    strcat(filename, ".txt");
+        //προσθήκη κατάληξης ".txt"
+        strcat(filename, ".txt");
 
-    //διαγραφή αναγνωριστικού
-    bool check1 = delete_matrixName(name);
-    //διαγραφή αρχείου
-    bool check2 = remove(filename) == 0;
+        //διαγραφή αναγνωριστικού
+        bool check1 = delete_matrixName(name);
+        //διαγραφή αρχείου
+        bool check2 = remove(filename) == 0;
 
-    //έλεγχος διαγραφής
-    if(check1 && check2)
-        printf("Διαγράφτηκε επιτυχως\n");
-    else
-        printf("Αδυναμία διαγραφης\n");
+        //έλεγχος διαγραφής
+        if(check1 && check2)
+            printf("Διαγράφτηκε επιτυχώς\n");
+        else
+            printf("Αδυναμία διαγραφής\n");
+    }
 }
 
 /* Επιλογή συστοιχίας:
@@ -484,46 +521,51 @@ void delete_matrix() {
  * Επιστρέφει: structure με την συστοιχία επιλογής
  */
 struct matrix choose_matrix(char *m_identifier, bool vect) {
-    printf("Επιλογή συστοιχίας %s", m_identifier);
-    int choice = menu("\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+    //δημιουργία συστοιχίας
+    struct matrix matrix = define_matrix();
 
-    while(choice != 1 && choice != 2) {
+    printf("Επιλογή συστοιχίας %s", m_identifier);
+    int choice = menu("\n0.Ακύρωση\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+
+    while(choice != 1 && choice != 2 && choice != 0) {
         puts("Η επιλογή αυτή δεν υπάρχει");
-        choice = menu("\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
+        choice = menu("\n0.Ακύρωση\n1.Επιλογή από διαθέσιμες συστοιχίες\n2.Εισαγωγή συστοιχίας\n\n");
     }
 
     if(choice == 2)
         return getmatrix(vect);
-
-    struct matrix matrix = define_matrix();
+    else if(choice == 0) {
+        matrix.invalid = true;
+        return matrix;
+    }
 
     //επιλογή από διαθέσιμους πίνακες
     char *filename = show_matrixes();
-    if (strcmp(filename,"") != 0){
-    strcat(filename,".txt");
-
-    //άνοιξε αρχείο σε read mode
-    FILE* fp;
-    fp = fopen(filename, "r");
-
-    //επανάληψη μέχρι η εισαγωγή του χρήστη να αντιστοιχεί σε αναγνωριστικό συστοιχίας
-    while(fp == NULL) {
-        printf("Ο πίνακας δεν υπάρχει\n");
-        scanf("%s", filename);
+    if(*filename != '\0') {
         strcat(filename, ".txt");
+
+        //άνοιξε αρχείο σε read mode
+        FILE* fp;
         fp = fopen(filename, "r");
-    }
 
-    //διαστάσεις: γραμμές & στήλες
-    fscanf(fp, "%d", &matrix.rows);
-    matrix.rows = abs(matrix.rows); //σε περίπτωση που δώθηκε αρνητική τιμή
-    fscanf(fp, "%d", &matrix.cols);
-    matrix.cols = abs(matrix.cols); //σε περίπτωση που δώθηκε αρνητική τιμή
+        //επανάληψη μέχρι η εισαγωγή του χρήστη να αντιστοιχεί σε αναγνωριστικό συστοιχίας
+        while(fp == NULL) {
+            printf("Ο πίνακας δεν υπάρχει\n");
+            scanf("%s", filename);
+            strcat(filename, ".txt");
+            fp = fopen(filename, "r");
+        }
 
-    //μεταφορά στοιχείων συστοιχίας από το αρχείο σε πίνακα σε structure
-    for(int i = 0; i < matrix.rows; i++)
-        for(int j = 0; j < matrix.cols; j++)
-            fscanf(fp, "%lf", &matrix.mat[i][j]);
+        //διαστάσεις: γραμμές & στήλες
+        fscanf(fp, "%d", &matrix.rows);
+        matrix.rows = abs(matrix.rows); //σε περίπτωση που δώθηκε αρνητική τιμή
+        fscanf(fp, "%d", &matrix.cols);
+        matrix.cols = abs(matrix.cols); //σε περίπτωση που δώθηκε αρνητική τιμή
+
+        //μεταφορά στοιχείων συστοιχίας από το αρχείο σε πίνακα σε structure
+        for(int i = 0; i < matrix.rows; i++)
+            for(int j = 0; j < matrix.cols; j++)
+                fscanf(fp, "%lf", &matrix.mat[i][j]);
     } else
         matrix.invalid = true;
 
@@ -549,7 +591,10 @@ struct matrix matrix_operations(int operation) {
             {
                 struct matrix A = choose_matrix("A", false);
                 struct matrix B = choose_matrix("Β", false);
-                matrixC = sum_matrix(A, B);
+                if(!A.invalid && !B.invalid)
+                    matrixC = sum_matrix(A, B);
+                else
+                    matrixC.invalid = true;
             }
             break;
         case subtraction:
@@ -557,7 +602,11 @@ struct matrix matrix_operations(int operation) {
             {
                 struct matrix A = choose_matrix("A", false);
                 struct matrix B = choose_matrix("Β", false);
-                matrixC = subtraction_matrix(A, B);
+                if(!A.invalid && !B.invalid)
+                    matrixC = subtraction_matrix(A, B);
+                else
+                    matrixC.invalid = true;
+
             }
             break;
         case multiplicationMatrix:
@@ -565,7 +614,11 @@ struct matrix matrix_operations(int operation) {
             {
                 struct matrix A = choose_matrix("A", false);
                 struct matrix B = choose_matrix("Β", false);
-                matrixC = multiplication_matrix(A, B);
+                if(!A.invalid && !B.invalid)
+                    matrixC = multiplication_matrix(A, B);
+                else
+                    matrixC.invalid = true;
+
             }
             break;
 
@@ -587,16 +640,17 @@ struct matrix matrix_operations(int operation) {
             if(A.rows == A.cols) {
                 double d = det(A);
                 printf("Ορίζουσα: %.2lf\n", d);
-            } else{
+            } else {
                 puts("Ο πίνακας πρέπει να είναι τετραγωνικός");
                 matrixC.invalid = true;
             }
             break;
         case inverse:
             //αντίστροφος
-            if(A.rows == A.cols) {
-               matrixC = inverse_matrix(choose_matrix("A", false));
-            } else{
+            if(A.rows == A.cols)
+                matrixC = inverse_matrix(choose_matrix("A", false));
+
+            else {
                 puts("Ο πίνακας πρέπει να είναι τετραγωνικός");
                 matrixC.invalid = true;
             }
@@ -646,30 +700,38 @@ struct matrix vector_operations(int operation) {
     C.vect = true;
 
     switch(operation) {
-    case sum2:
-        //πρόσθεση
-        {
-            struct matrix A = choose_matrix("A", true);
-            struct matrix B = choose_matrix("Β", true);
-            if(A.cols == 1 && B.cols == 1)
-                C = sum_matrix(A, B);
-            else {
-                puts("Ένας τουλάχιστον πίνακας δεν είναι διάνυσμα");
-                C.invalid = true;
+        case sum2:
+            //πρόσθεση
+            {
+                struct matrix A = choose_matrix("A", true);
+                struct matrix B = choose_matrix("Β", true);
+                if(!A.invalid && !B.invalid) {
+                    if(A.cols == 1 && B.cols == 1)
+                        C = sum_matrix(A, B);
+                    else {
+                        puts("Ένας τουλάχιστον πίνακας δεν είναι διάνυσμα");
+                        C.invalid = true;
+                    }
+                } else
+                    C.invalid = true;
             }
-        }
-        break;
-    case subtraction2:
+            break;
+        case subtraction2:
             //αφαίρεση
             {
                 struct matrix A = choose_matrix("A", true);
                 struct matrix B = choose_matrix("Β", true);
-                if(A.cols == 1 && B.cols == 1)
-                    C = subtraction_matrix(A, B);
-                else {
-                    puts("Ένας τουλάχιστον πίνακας δεν είναι διάνυσμα");
+
+                //έλεγχος
+                if(!A.invalid && !B.invalid) {
+                    if(A.cols == 1 && B.cols == 1)
+                        C = subtraction_matrix(A, B);
+                    else {
+                        puts("Ένας τουλάχιστον πίνακας δεν είναι διάνυσμα");
+                        C.invalid = true;
+                    }
+                } else
                     C.invalid = true;
-                }
             }
             break;
         case dotProduct:
@@ -677,9 +739,12 @@ struct matrix vector_operations(int operation) {
             {
                 struct matrix A = choose_matrix("A", true);
                 struct matrix B = choose_matrix("Β", true);
-                C.invalid = true;
+                if(!A.invalid && !B.invalid) {
+                    C.invalid = true;
 
-                printf("Eσωτερικό γινόμενο: %.2lf", esgin(A, B));
+                    printf("Eσωτερικό γινόμενο: %.2lf", esgin(A, B));
+                } else
+                    C.invalid = true;
             }
             break;
         case vectorProduct:
@@ -687,7 +752,11 @@ struct matrix vector_operations(int operation) {
             {
                 struct matrix A = choose_matrix("A", true);
                 struct matrix B = choose_matrix("Β", true);
-                C = vector_product(A, B);
+                if(!A.invalid && !B.invalid)
+                    C = vector_product(A, B);
+
+                else
+                    C.invalid = true;
             }
             break;
         case backToHome2:
@@ -721,7 +790,7 @@ void print_matrix(struct matrix A) {
  *
  * Επιστρέφει: structure matrix με αρχικοποιημένες μεταβλητές
  */
-struct matrix define_matrix() {
+struct matrix define_matrix(void) {
     struct matrix y;
     y.invalid = false;
     y.vect = false;
@@ -732,8 +801,8 @@ struct matrix define_matrix() {
 /* Προβολή αρχικού μηνύματος:
  * Προβoλή ονομάτων των συγγραφέων του προγράμματος
  */
-void startMsg() {
-    puts("Το παρόν πρόγραμμα γράφτηκε από την Αικατερίνη Παπαγιαννίτση και Μαρία Μηλιούση\n\
-ως εργασία του μαθήματος Δομημμένος Προγραμματισμός, έτος: 2021-2022\n");
-    }
+void startMsg(void) {
+    puts("Το παρόν πρόγραμμα γράφτηκε από την Αικατερίνη Παπαγιαννίτση και\n\
+Μαρία Μηλιούση ως εργασία του μαθήματος Δομημμένος Προγραμματισμός,\nέτος 2021-2022\n");
+}
 

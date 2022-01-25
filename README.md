@@ -20,7 +20,7 @@
 
 
 <div class="diagram">
-΄΄΄flow
+flow΄΄΄
 s=>start:  Αρχή
 e=>end: Τέλος
 pm=>inputoutput: Αρχικό Μενού και

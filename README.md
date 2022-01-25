@@ -16,3 +16,35 @@
 ## Περιγραφή
 - Γίνεται επιστροφή στο αρχικό μενού, μέχρι ο χρήστης να διαλέξει την επιλογή εξόδου 
 - Στην 
+
+
+```flow
+s=>start:  Αρχή
+e=>end: Τέλος
+pm=>inputoutput: Αρχικού Μενού και Επιλογή Χρήστη
+cond1=>condition: Έξοδος;
+cond2=>condition: Δημιουγία Συστοιχίας
+cond3=>condition: Προβολή Συστοιχιών
+cond4=>condition: Φόρτωση συστοιχίας
+cond5=>condition: Διαγραφή συστοιχίας
+cond6=>condition: Πράξεις πινάκων
+cond7=>condition: Πράξεις διανυσμάτων
+
+iom =>inputoutput: Εισαγωγή Πίνακα
+subr_save=>subroutine: save_matrix()
+
+
+s->pm->cond1
+cond1(yes)->e
+cond1(no, right)->cond2
+cond2(no, right)->cond3
+cond2(yes)->iom
+cond3(no, right)->cond4
+cond4(no, right)->cond5
+cond5(no, right)->cond6
+cond6(no, right)->cond7
+
+
+
+
+```

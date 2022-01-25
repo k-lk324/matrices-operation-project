@@ -80,6 +80,7 @@ choice2(no)->io5->opop
 cond7(no,right)->cond1
 cond7(yes)->vector(right)->pm
 cond1(yes)->e
+ 
 </div>
 
 <script>

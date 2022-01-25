@@ -17,9 +17,6 @@
 
 ![image](https://user-images.githubusercontent.com/97043061/151072773-08e5df7e-779e-4856-9ac4-bb6406fb321b.png)
 
-
-
-<div class="diagram">
 ```flow
 s=>start:  Αρχή
 e=>end: Τέλος
@@ -82,8 +79,3 @@ cond7(no,right)->cond1
 cond7(yes)->vector(right)->pm
 cond1(yes)->e
 ```
-</div>
-
-<script>
-$(".diagram").flowchart();
-</script>

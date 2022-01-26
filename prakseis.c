@@ -23,7 +23,7 @@ struct matrix adj(struct matrix A) {
 
     for(int i = 0; i < y.rows; i++) {
         for(int j = 0; j < y.cols; j++)
-            y.mat[i][j] = pow(-1, (i + 1) + (j + 1)) * det(cofactor(A,i,j));
+            y.mat[i][j] = pow(-1, (i + 1) + (j + 1)) * det(cofactor(A, i, j));
     }
     return transpose_matrix(y);
 }
@@ -88,9 +88,8 @@ double ixnos(struct matrix A) {
                     trace += A.mat[i][j];
             }
         }
-    } else {
+    } else
         puts("Ο πίνακας δεν είναι τετραγωνικός");
-    }
     return trace;
 }
 
@@ -156,8 +155,8 @@ struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
             }
         }
     } else {
-    C.invalid = true;
-    puts("O πολλαπλασιασμός δεν ορίζεται");
+        C.invalid = true;
+        puts("O πολλαπλασιασμός δεν ορίζεται");
     }
 
     return C;
@@ -305,11 +304,10 @@ struct matrix vector_product(struct matrix A, struct matrix B) {
  * Παράμετρος double c: σταθερός αριθμός
  * Επιστρέφει: structure με τον πολλαπλασιασμένο πίνακα
  */
-struct matrix multiply_byNumber(struct matrix A, double c){
-    for (int i =0; i<A.rows; i++){
-        for (int j =0; j<A.cols; j++){
+struct matrix multiply_byNumber(struct matrix A, double c) {
+    for(int i = 0; i < A.rows; i++) {
+        for(int j = 0; j < A.cols; j++)
             A.mat[i][j] = A.mat[i][j] * c;
-        }
     }
     return A;
 }

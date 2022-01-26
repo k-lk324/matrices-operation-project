@@ -14,4 +14,7 @@
  > Σημείωση: Για προβολή διαθέσιμων συστοιχιών ή επιλογή από διαθέσιμες συστοιχίες χρειάζεται πρώτα δημιουργία ή φόρτωση συστοιχιών
 
 ## Περιγραφή
-![Untitled Diagram drawio2](https://user-images.githubusercontent.com/97043061/151143734-aad07b49-89a1-4d4f-8a34-ee5503b2625b.png)
+![Untitled Diagram drawio4](https://user-images.githubusercontent.com/97043061/151150695-bf265094-92ad-4611-a497-231f46dd8e59.png)
+
+## Πηγές
+*

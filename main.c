@@ -140,6 +140,7 @@ int main(void) {
                     if(!result.invalid) {
                         do {
                             printf("Αποθήκευση συστοιχίας[y/n];");
+                            fflush(stdin);
                             answer = getchar();
 
                             if(answer == 'y')
@@ -310,7 +311,7 @@ char *show_matrixes(void) {
 
     char matrixName[50];
     int cnt = 0 ;
-    printf("0. Ακύρωση\n");
+    printf("0.Ακύρωση επιλογής\n");
     //επανέλαβε μέχρι το τέλος του αρχείου
     for(int i = 0; (fscanf(AM, "%s", matrixName)) != EOF; i++) {
         cnt++;
@@ -803,6 +804,6 @@ struct matrix define_matrix(void) {
  */
 void startMsg(void) {
     puts("Το παρόν πρόγραμμα γράφτηκε από την Αικατερίνη Παπαγιαννίτση και\n\
-Μαρία Μηλιούση ως εργασία του μαθήματος Δομημμένος Προγραμματισμός,\nέτος 2021-2022\n");
+Μαρία Μηλιούση ως εργασία του μαθήματος Δομημένος Προγραμματισμός,\nέτος 2021-2022\n");
 }
 

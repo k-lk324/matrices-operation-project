@@ -16,7 +16,7 @@
  > Σημείωση: Για προβολή διαθέσιμων συστοιχιών ή επιλογή από διαθέσιμες συστοιχίες χρειάζεται πρώτα δημιουργία ή φόρτωση συστοιχιών
 
 ## Περιγραφή
-![Untitled Diagram drawio6](https://user-images.githubusercontent.com/97043061/151163102-c0e620b6-25a0-4052-b100-ea1a20f90c82.png)
+![Untitled Diagram drawio7](https://user-images.githubusercontent.com/97043061/151209147-d642ab27-a047-4a2f-9aed-9f561712bb98.png)
 
 ## Πηγές
 * Διαφάνειες του μαθήματος Δομημένος Προγραμματισμός

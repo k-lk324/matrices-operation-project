@@ -1,3 +1,5 @@
+//το αρχείο περιέχει την main και όλες τις συναρτήσεις που χρησιμοποιούνται
+//εκτός από αυτές για τις πράξεις πινάκων και διανυσμάτων
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -51,6 +53,7 @@ enum vectorOp {sum2 = 1, subtraction2, dotProduct, vectorProduct, backToHome2};
 void startMsg(void);
 int menu(char* menu);
 
+//συναρτήσεις για αλληλεπίδραση με structures που περιέχουν συστοιχίες
 struct matrix define_matrix(void);
 struct matrix getmatrix(bool);
 struct matrix choose_matrix(char*, bool);
@@ -229,34 +232,38 @@ bool save_matrix(struct matrix x) {
     //άνοιγμα αρχείου διαθέσιμων συστοιχιών σε read mode
     FILE* amReadFp;
     amReadFp = fopen("available_matrix.txt", "r");
-    if(amReadFp == NULL)
-        return false;
 
-    do {
-        unique_name = true;
-        rewind(amReadFp);
+    if(amReadFp != NULL) {
 
-        //Eισαγωγή αναγνωριστικού από τον χρήστη
-        printf("\nΟρισμός αναγνωριστικού: ");
-        scanf("%s", name);
-        fflush(stdin);
+        do {
+            unique_name = true;
+            rewind(amReadFp);
 
-        //επανάληψη μέχρι το τέλος του αρχείου
-        while(!feof(amReadFp)) {
-            char matrixName[50];
-            fscanf(amReadFp, "%s", matrixName);
+            //Eισαγωγή αναγνωριστικού από τον χρήστη
+            printf("\nΟρισμός αναγνωριστικού: ");
+            scanf("%s", name);
 
-            //αν το αναγνωριστικό που δώθηκε είναι ίδιο με ήδη υπάρχον αναγνωριστικό
-            if(strcmp(name, matrixName) == 0) {
-                printf("Το αναγνωριστικό %s χρησιμοποιείται ήδη", name);
-                unique_name = false;
-                break;
+            //επανάληψη μέχρι το τέλος του αρχείου
+            while(!feof(amReadFp)) {
+                char matrixName[50];
+                fscanf(amReadFp, "%s", matrixName);
+
+                //αν το αναγνωριστικό που δώθηκε είναι ίδιο με ήδη υπάρχον αναγνωριστικό
+                if(strcmp(name, matrixName) == 0) {
+                    printf("Το αναγνωριστικό %s χρησιμοποιείται ήδη", name);
+                    unique_name = false;
+                    break;
+                }
             }
-        }
-    } while(!unique_name);
+        } while(!unique_name);
 
-    //κλείσιμο αρχείου διαθέσιμων συστοιχιών
-    fclose(amReadFp);
+        //κλείσιμο αρχείου διαθέσιμων συστοιχιών
+        fclose(amReadFp);
+    } else{
+            //Eισαγωγή αναγνωριστικού από τον χρήστη
+            printf("\nΟρισμός αναγνωριστικού: ");
+            scanf("%s", name);
+    }
 
     //άνοιγμα αρχείου διαθέσιμων συστοιχιών σε append mode
     FILE* am_file;
@@ -292,7 +299,7 @@ bool save_matrix(struct matrix x) {
 }
 
 /* Προβολή διαθέσιμων πινάκων:
- * ’νοιγμα αρχείου διαθέσιμων πινάκων
+ * Άνοιγμα αρχείου διαθέσιμων πινάκων
  * και προβολή των αναγνωριστικών πινάκων
  *
  * Επιστρέφει: false αν παρουσιαστεί σφάλμα και true αν εκτελεστεί επιτυχώς
@@ -492,7 +499,7 @@ bool delete_matrixName(char *name) {
  */
 void delete_matrix(void) {
     char *name = show_matrixes();
-    if(*name != '\0'){
+    if(*name != '\0') {
 
         char filename[50];
         strcpy(filename, name);

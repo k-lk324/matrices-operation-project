@@ -635,7 +635,8 @@ struct matrix matrix_operations(int operation) {
             {
                 double number = 0;
                 struct matrix A = choose_matrix("", false);
-                puts("\nΕισαγωγή αριθμού: ");
+                printf("\nΕισαγωγή αριθμού: ");
+                scanf("%lf", &number);
                 matrixC = multiply_byNumber(A, number);
             }
             break;

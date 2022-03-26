@@ -11,10 +11,10 @@
 
 struct matrix define_matrix();
 
-/* Υπολογισμός προσαρτημένου πίνακα:
+/* Calculating adjugate matrix:
  *
- * Παράμετρος struct matrix A: πίνακας του οποίου υπολογίζεται ο προσαρτημένος
- * Επιστρέφει: structure με τον προσαρτημένο πίνακα
+ * Parameter struct matrix A: the matrix of which the adjugate matrix is calculated
+ * Returns: structure with adjugate matrix
  */
 struct matrix adj(struct matrix A) {
     struct matrix y = define_matrix();
@@ -28,18 +28,18 @@ struct matrix adj(struct matrix A) {
     return transpose_matrix(y);
 }
 
-/* Υπολογισμός αντίστροφου πίνακα:
- * Έλεγχος αν ο πίνακας που δώθηκε είναι αντιστρέψιμος
+/* Calculating inverse matrix:
+ * Checking if matrix given is inversable
  *
- * Παράμετρος struct matrix A: τετραγωνικός πίνακας του οποίου υπολογίζεται ο αντίστροφος
- * Επιστρέφει: structure με τον αντίστροφο πίνακα
+ * Paramenter struct matrix A: τετραγωνικός matrix of which the inverse matrix is calculated
+ * Returns: structure with inverse matrix
  */
 struct matrix inverse_matrix(struct matrix A) {
     struct matrix X = define_matrix();
     X.cols = X.rows = A.rows;
 
     if(det(A) == 0) {
-        puts("Ο πίνακας δεν ειναι αντιστρέψιμος");
+        puts("Matrix is not inversable");
         X.invalid = true;
     } else {
         for(int i = 0; i < X.rows; i++)
@@ -50,12 +50,12 @@ struct matrix inverse_matrix(struct matrix A) {
     return X;
 }
 
-/* Δυνάμεις πινάκων:
- * Πολλαπλασιασμός τετραγωνικού πίνακα με τον ευατό του ν φορές
+/* Matrix in power:
+ * Multiplying square matrix with itself n times
  *
- * Παράμετρος struct matrix A: πίνακας του οποίου υπολογίζεται ο αντίστροφος
- * Παράμετρος int power: ακέραιος που δηλώνει την δύναμη που θα υψωθεί ο πίνακας
- * Επιστρέφει: structure με τον εκθετικό πίνακα
+ * Parameter struct matrix A: the base matrix
+ * Parameter int power: integer which functions as exponent
+ * Return: structure exponent matrix
  */
 struct matrix exp_matrix(struct matrix A, int power) {
     struct matrix y = A;
@@ -65,20 +65,20 @@ struct matrix exp_matrix(struct matrix A, int power) {
             y = multiplication_matrix(y, A);
     } else {
         y.invalid = true;
-        puts("O πίνακας δεν είναι τετραγωνικός");
+        puts("Matrix is not square");
     }
 
     return y;
 }
 
-/* Ίχνος πίνακα:
- * Έλεγχος αν ο πίνακας είναι τετραγωνικός
- * Πρόσθεση στοιχείων της κύριας διαγωνίου
+/* Trace:
+ * Check if matrix is square
+ * Add elements of primary diagonal
  *
- * Παράμετρος struct matrix A: structure με πίνακα
- * Επιστρέφει: το ίχνος ως δεκαδικό αριθμό
+ * Parameter struct matrix A: structure with matrix
+ * Returns: trace as double
  */
-double ixnos(struct matrix A) {
+double trace_mat(struct matrix A) {
 
     double trace = 0;
     if(A.rows == A.cols) {
@@ -89,34 +89,34 @@ double ixnos(struct matrix A) {
             }
         }
     } else
-        puts("Ο πίνακας δεν είναι τετραγωνικός");
+        puts("Matrix is not square");
     return trace;
 }
 
-/* Εσωτερικό γινόμενο:
- * Έλεγχος αν τα διανύσματα έχουν τις ίδιες διαστάσεις
- * Υπολογισμός εσωτερικού γινομένου δύο διανυσμάτων Α και Β
+/* Dot Product:
+ * Check if vectors have the same dimensions
+ * Calculating the dot product of vector A and B
  *
- * Παράμετρος struct matrix A: structure με διάνυσμα
- * Παράμετρος struct matrix Β: structure με διάνυσμα
- * Επιστρέφει: το εσωτερικό γινόμενο ως δεκαδικό αριθμό
+ * Parameter struct matrix A: structure with vector
+ * Parameter struct matrix Β: structure with vector
+ * Returns: dot product as double
  */
-double esgin(struct matrix A, struct matrix B) {
+double dot_product(struct matrix A, struct matrix B) {
     double p = 0;
     if(A.rows == B.rows) {
         for(int i = 0; i < A.rows; i++)
             p += A.mat[i][0] * B.mat[i][0];
     } else
-        puts("Τα διανύσματα δεν έχουν τις ίδιες διαστάσεις");
+        puts("Vectors dont have same dimensions");
 
     return p;
 }
 
-/* Υπολογισμός ανάστροφος ενός πίνακα:
- * Αναστροφή γραμμών και στηλών
+/* Calculating transpose matrix:
+ * Reversing lines and collumns 
  *
- * Παράμετρος struct matrix A: structure με πίνακα
- * Επιστρέφει: structure με τον ανάστροφο
+ * Παράμετρος struct matrix A: structure with matrix
+ * Returns: structure with transpose
  */
 struct matrix transpose_matrix(struct matrix A) {
     struct matrix At = define_matrix();
@@ -220,9 +220,6 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
  * Επιστρέφει: την ορίζουσα ως δεκαδικό
  */
 double det(struct matrix A) {
-#ifdef DEBUG
-    printf("\nΑΡΧΗ ΤΗΣ DET\n");
-#endif // DEBUG
     int n = A.rows;
     double d = 0;
     double *pd = &d;

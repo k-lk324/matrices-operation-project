@@ -1,4 +1,4 @@
-## english version coming soon
+## english version coming ~~soon~~ at some point
 
 # Πράξεις Πινάκων
 ## Περιεχόμενα

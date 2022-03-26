@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include "prakseis.h"
+#include "operations.h"
 #define ROWS_MAX 20
 #define COLS_MAX 20
 #define NOT_DEBUG

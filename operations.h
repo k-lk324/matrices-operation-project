@@ -14,7 +14,7 @@ struct matrix {
 struct matrix adj(struct matrix A);
 struct matrix inverse_matrix(struct matrix A);
 struct matrix exp_matrix(struct matrix A, int power);
-double ixnos(struct matrix A);
+double trace_mat(struct matrix A);
 struct matrix transpose_matrix(struct matrix A);
 struct matrix multiplication_matrix(struct matrix A, struct matrix B);
 double det(struct matrix);
@@ -22,7 +22,7 @@ struct matrix cofactor(struct matrix, int, int);
 struct matrix subtraction_matrix(struct matrix A, struct matrix B);
 struct matrix sum_matrix(struct matrix A, struct matrix B);
 struct matrix vector_product(struct matrix A, struct matrix B);
-double esgin(struct matrix, struct matrix);
+double dot_product(struct matrix, struct matrix);
 struct matrix vector_product(struct matrix A, struct matrix B);
 struct matrix multiply_byNumber(struct matrix, double);
 

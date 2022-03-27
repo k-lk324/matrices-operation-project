@@ -156,7 +156,7 @@ struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
         }
     } else {
         C.invalid = true;
-        puts("O πολλαπλασιασμός δεν ορίζεται");
+        puts("Multiplication cannot be made");
     }
 
     return C;
@@ -208,7 +208,7 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
                 C.mat[i][j] = A.mat[i][j] + B.mat[i][j];
     } else {
         C.invalid = true;
-        puts("Οι πίνακες δεν έχουν τις ίδιες διαστάσεις");
+        puts("Matrices don't have the same dimensions");
     }
 
     return C;
@@ -285,7 +285,7 @@ struct matrix vector_product(struct matrix A, struct matrix B) {
         C.mat[1][0] = A.mat[2][0] * B.mat[0][0] - A.mat[0][0] * B.mat[2][0];
         C.mat[2][0] = A.mat[0][0] * B.mat[1][0] - A.mat[1][0] * B.mat[0][0];
     } else {
-        puts("Το εξωτερικό γινόμενο επιτρέπει μόνο διανύσματα 3 διαστάσεων");
+        puts("Vector product only allows vectors with 3 dimensions");
         C.invalid = true;
     }
     return C;

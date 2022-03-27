@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include "operations.h"
+#include "matrix_operations_lib.h"
 #define ROWS_MAX 20
 #define COLS_MAX 20
 #define NOT_DEBUG

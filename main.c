@@ -1,5 +1,4 @@
-//το αρχείο περιέχει την main και όλες τις συναρτήσεις που χρησιμοποιούνται
-//εκτός από αυτές για τις πράξεις πινάκων και διανυσμάτων
+//this file includes the main function
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -11,35 +10,35 @@
 #define NOT_DEBUG
 #define NOT_DEBUGSTR
 
-//αρχικό μενού
-char *prime_menu = "\tΠΡΑΞΕΙΣ ΜΕΤΑΞΥ ΠΙΝΑΚΩΝ\n\n\
-1.Δημιουργία συστοιχίας\n\
-2.Προβολή διαθέσιμων συστοιχιών\n\
-3.Φόρτωση συστοιχίας\n\
-4.Διαγραφή συστοιχίας\n\
-5.Πράξεις πινάκων\n\
-6.Πράξεις διανυσμάτων\n\
-7.Έξοδος\n\n";
+//starting menu
+char *prime_menu = "\tMATRIX OPERATIONS\n\n\
+1.Create matrix\n\
+2.Show availabel matrices\n\
+3.Load matrix\n\
+4.Delete matrix\n\
+5.Matrix operations\n\
+6.Vector operations\n\
+7.Exit\n\n";
 
 enum home {createMatrix = 1, showMatrix, ld_matrix, del, matrixOperations, vectorOperations, end};
 
-//μενού για πράξεις πινάκων
+//menu for matrix operations
 char *matrixOp_menu = "\n\
-1.Πρόσθεση\n\
-2.Aφαίρεση\n\
-3.Πολλαπλασιασμός πινάκων\n\
-4.Πολλαπλασιασμός με αριθμό\n\
-5.Ορίζουσα\n\
-6.Αντίστροφος\n\
-7.Ανάστροφος\n\
-8.Δυνάμεις πινάκων\n\
-9.Ίχνος\n\
-10.Επιστροφή στο αρχικό μενού\n\n";
+1.Addition\n\
+2.Subraction\n\
+3.Multiplication with matrix\n\
+4.Multiplication with number\n\
+5.Determinant\n\
+6.Inverse\n\
+7.Transpose\n\
+8.Exponential\n\
+9.Trace\n\
+10.Return to starting menu\n\n";
 
-//περιπτώσεις πράξεων πινάκων
+//cases for matrix operations
 enum matrixOp {sum = 1, subtraction, multiplicationMatrix, multiplicationNumber, determinant, inverse, transpose, degree, trace, backToHome};
 
-//μενού για πράξεις διανυσμάτων
+//menu for vector operations
 char *vectOp_menu = "\n\
 1.Πρόσθεση\n\
 2.Aφαίρεση\n\
@@ -47,13 +46,13 @@ char *vectOp_menu = "\n\
 4.Εξωτερικό Γινόμενο\n\
 5.Επιστροφή στο αρχικό μενού\n\n";
 
-//περιπτώσεις πράξεων διανυσμάτων
+//cases for vector operations
 enum vectorOp {sum2 = 1, subtraction2, dotProduct, vectorProduct, backToHome2};
 
 void startMsg(void);
 int menu(char* menu);
 
-//συναρτήσεις για αλληλεπίδραση με structures που περιέχουν συστοιχίες
+//functions for interacting with structure matrix
 struct matrix define_matrix(void);
 struct matrix getmatrix(bool);
 struct matrix choose_matrix(char*, bool);
@@ -62,7 +61,7 @@ struct matrix vector_operations(int);
 void print_matrix(struct matrix);
 
 
-//συναρτήσεις για αλληλεπίδραση με αρχεία
+//functions for file interacting
 bool save_matrix(struct matrix x);
 char *show_matrixes(void);
 bool load_matrix(void);

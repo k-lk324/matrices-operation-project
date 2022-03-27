@@ -115,7 +115,7 @@ double dot_product(struct matrix A, struct matrix B) {
 /* Calculating transpose matrix:
  * Reversing lines and collumns 
  *
- * Παράμετρος struct matrix A: structure with matrix
+ * Parameter struct matrix A: structure with matrix
  * Returns: structure with transpose
  */
 struct matrix transpose_matrix(struct matrix A) {
@@ -130,12 +130,12 @@ struct matrix transpose_matrix(struct matrix A) {
     return At;
 }
 
-/* Πολλαπλασιασμός 2 πινάκων:
- * Έλεγχος αν ορίζεται ο πολλαπλασιασμός
+/* Multiplication of 2 matrices:
+ * Check if multiplication can be made
  *
- * Παράμετρος struct matrix A: structure με πίνακα
- * Παράμετρος struct matrix Β: structure με πίνακα
- * Επιστρέφει: structure με τον πίνακα γινομένου
+ * Parameter struct matrix A: structure with matrix
+ * Parameter struct matrix Β: structure with matrix
+ * Returns: structure with result
  */
 struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
     struct matrix C = define_matrix();
@@ -162,12 +162,12 @@ struct matrix multiplication_matrix(struct matrix A, struct matrix B) {
     return C;
 }
 
-/* Aφαίρεση 2 πινάκων:
- * Έλεγχος αν ορίζεται η αφαίρεση
+/* Subtraction of 2 matrices:
+ * Check if subtraction can be made 
  *
- * Παράμετρος struct matrix A: structure με πίνακα
- * Παράμετρος struct matrix Β: structure με πίνακα
- * Επιστρέφει: structure με τον πίνακα διαφοράς
+ * Parameter struct matrix A: structure with matrix
+ * Παράμετρος struct matrix Β: structure with matrix
+ * Returns: structure with result
  */
 struct matrix subtraction_matrix(struct matrix A, struct matrix B) {
     struct matrix C = define_matrix();
@@ -186,12 +186,12 @@ struct matrix subtraction_matrix(struct matrix A, struct matrix B) {
     return C;
 }
 
-/* Πρόσθεση 2 πινάκων:
- * Έλεγχος αν ορίζεται η πρόσθεση
+/* Sum of 2 matrices:
+ * Check if addition can be made
  *
- * Παράμετρος struct matrix A: structure με πίνακα
- * Παράμετρος struct matrix Β: structure με πίνακα
- * Επιστρέφει: structure με τον πίνακα αθροίσματος
+ * Parameter struct matrix A: structure with matrix
+ * Parameter struct matrix Β: structure with matrix
+ * Returns: structure with result
  */
 struct matrix sum_matrix(struct matrix A, struct matrix B) {
 
@@ -214,10 +214,10 @@ struct matrix sum_matrix(struct matrix A, struct matrix B) {
     return C;
 }
 
-/* Yπολογισμός ορίζουσας:
+/* Calculating determinant:
  *
- * Παράμετρος struct matrix Α: structure με τετραγωνικό πίνακα
- * Επιστρέφει: την ορίζουσα ως δεκαδικό
+ * Parameter struct matrix Α: structure with square matrix
+ * Returns: determinant as double
  */
 double det(struct matrix A) {
     int n = A.rows;
@@ -235,20 +235,17 @@ double det(struct matrix A) {
     return *pd;
 }
 
-/* Συμπαράγοντας Αxy:
+/* Cofactor Αxy:
  *
- * Παράμετρος struct matrix Α: structure με τετραγωνικό πίνακα
- * Παράμετρος int x: ακέραιος που δηλώνει την γραμμή που θα αφαιρεθεί
- * Παράμετρος int y: ακέραιος που δηλώνει την στήλη που θα αφαιρεθεί
- * Επιστρέφει: structure με τον πίνακα αθροίσματος
+ * Parameter struct matrix Α: structure with square
+ * Parameter int x: integer indicating the line to be removed
+ * Parameter int y: integer indicating the collumn to be removed
+ * Returns: structure with cofactor
  */
 struct matrix cofactor(struct matrix A, int x, int y) {
-#ifdef DEBUG
-    puts("αρχη της cofactor");
-#endif // DEBUG
 
     int n = A.rows;
-    //δημιουργία πίνακα αποτελέσματος
+    //creation of result matrix 
     struct matrix B = define_matrix();
     B.rows = B.cols = n - 1;
     int a = 0, b = 0;
@@ -267,21 +264,21 @@ struct matrix cofactor(struct matrix A, int x, int y) {
     return B;
 }
 
-/* Eξωτερικό γινόμενο:
- * Έλεγχος ότι τα διανύσματα ανήκουν στον Διανυσματικό Χώρο R^3
+/* Vector Product:
+ * Check if all vectors belong in R^3
  *
- * Παράμετρος struct matrix Α: structure με διάνυσμα
- * Παράμετρος struct matrix Β: structure με διάνυσμα
- * Επιστρέφει: structure με το διάνυσμα αποτελέσματος
+ * Parameter struct matrix Α: structure with vector
+ * Parameter struct matrix Β: structure with vector
+ * Returns: structure with result 
  */
 struct matrix vector_product(struct matrix A, struct matrix B) {
-    //δημιουργία πίνακα αποτελέσματος
+    //creation of result vector
     struct matrix C = define_matrix();
     C.vect = true;
     C.cols = 1;
     C.rows = 3;
 
-    //αν οι συστοιχίες είναι διανύσματα και έχουν 3 διαστάσεις
+    //check if matrices are vectors and have 3 dimensions 
     if(A.cols == 1 && B.cols == 1 && A.rows == 3 && B.rows == 3) {
 
         C.mat[0][0] = A.mat[1][0] * B.mat[2][0] - A.mat[2][0] * B.mat[1][0];
@@ -294,12 +291,12 @@ struct matrix vector_product(struct matrix A, struct matrix B) {
     return C;
 }
 
-/* Πολλαπλασιασμός πίνακα με αριθμό:
- * Πολλαπλασιασμός κάθε στοιχείου του πίνακα με σταθερό αριθμό
+/* Multiplication of matrix with number:
+ * Multiplication of every element with real number c
  *
- * Παράμετρος struct matrix Α: structure με πίνακα
- * Παράμετρος double c: σταθερός αριθμός
- * Επιστρέφει: structure με τον πολλαπλασιασμένο πίνακα
+ * Parameter struct matrix Α: structure with matrix
+ * Parameter double c: real number
+ * Returns: structure with result
  */
 struct matrix multiply_byNumber(struct matrix A, double c) {
     for(int i = 0; i < A.rows; i++) {

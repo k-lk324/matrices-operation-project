@@ -40,11 +40,11 @@ enum matrixOp {sum = 1, subtraction, multiplicationMatrix, multiplicationNumber,
 
 //menu for vector operations
 char *vectOp_menu = "\n\
-1.Πρόσθεση\n\
-2.Aφαίρεση\n\
-3.Εσωτερικό Γινόμενο\n\
-4.Εξωτερικό Γινόμενο\n\
-5.Επιστροφή στο αρχικό μενού\n\n";
+1.Addition\n\
+2.Subtraction\n\
+3.Dot Product\n\
+4.Cross Product\n\
+5.Return to Start Menu\n\n";
 
 //cases for vector operations
 enum vectorOp {sum2 = 1, subtraction2, dotProduct, vectorProduct, backToHome2};
@@ -73,23 +73,23 @@ int main(void) {
     startMsg();
     bool stop = false;
 
-    //μέχρι ο χρήστης να επιλέξει να σταματήσει το πρόγραμμα
+    //until the user chooses to stop the program
     while(!stop) {
         fflush(stdin);
 
-        //επιλογές του αρχικού μενού
+        //Start Menu choices
         switch(menu(prime_menu)) {
             case createMatrix:
-                //δημιουργία πίνακα
+                //create matrix
                 {
                     bool error = !save_matrix(getmatrix(false));
                     if(error)
-                        puts("Παρουσιάστηκε σφάλμα");
+                        puts("Error");
                 }
                 break;
 
             case showMatrix:
-                //προβολή διαθέσιμων πινάκων
+                //view available matrices
                 {
                     char *matrixForShow = show_matrixes();
                     if(*matrixForShow != '\0')
@@ -98,50 +98,48 @@ int main(void) {
                 break;
 
             case ld_matrix:
-                //φόρτωση πίνακα
+                //load matrix from file
                 if(!load_matrix())
-                    printf("Αδυναμία ανοίγματος αρχείου\n");
+                    printf("Unable to open file\n");
                 break;
 
-            case matrixOperations:
-                //πράξεις πινάκων
+            case matrixOperations:     
                 {
                     int choice = menu(matrixOp_menu);
                     struct matrix result = matrix_operations(choice);
-                    //προβολή αποτελέσματος
+                    //view result
                     print_matrix(result);
 
                     fflush(stdin);
-                    //αποθήκευση
+                    //save
                     char answer = '\0';
                     if(!result.invalid) {
                         do {
-                            printf("Αποθήκευση συστοιχίας[y/n];");
+                            printf("Save array? [y/n]");
                             answer = getchar();
 
                             if(answer == 'y')
                                 save_matrix(result);
                             else if(answer == 'n') {}
                             else
-                                puts("Δεν υπάρχει αυτή η επιλογή");
+                                puts("This isn't a valid option.");
                         } while(answer != 'n' && answer != 'y');
                     }
                 }
                 break;
             case vectorOperations:
-                //πράξεις διανυσμάτων
                 {
                     int choice = menu(vectOp_menu);
                     struct matrix result = vector_operations(choice);
 
-                    //προβολή αποτελέσματος
+                    //view result
                     print_matrix(result);
 
-                    //αποθήκευση
+                    //save result
                     char answer = '\0';
                     if(!result.invalid) {
                         do {
-                            printf("Αποθήκευση συστοιχίας[y/n];");
+                            printf("Save array?[y/n]");
                             fflush(stdin);
                             answer = getchar();
 
@@ -149,27 +147,27 @@ int main(void) {
                                 save_matrix(result);
                             else if(answer == 'n') {}
                             else
-                                puts("Δεν υπάρχει αυτή η επιλογή");
+                                puts("This isn't a valid option");
                         } while(answer != 'n' && answer != 'y');
                     }
                 }
                 break;
 
             case del:
-                //διαγραφή συστοιχίας
+                //delete array
                 delete_matrix();
                 break;
 
             case end:
-                //έξοδος προγράμματος
+                //exist program
                 stop = true;
                 break;
 
             default:
-                puts("Η επιλογή που βάλατε δεν υπάρχει");
+                puts("This isn't a valid option");
         }
 
-        //άφησε 3 κενές γραμμές
+        //print 3 empty lines
         for(int i = 0; i < 3; i++)
             printf("\n");
     }

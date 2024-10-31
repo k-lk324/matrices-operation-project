@@ -120,7 +120,7 @@ startMsg():
 Προβολή ονομάτων των δημιουργών του προγράμματος.
 
 
-##### Αρχείο prakseis.c:
+##### Αρχείο matrix_operations_lib.c:
 το αρχείο περιέχει τις συναρτήσεις που χρησιμοποιούνται για τις πράξεις πινάκων και
 διανυσμάτων.
 
@@ -172,7 +172,7 @@ multiply_byNumber():
 Πολλαπλασιασμός πίνακα με αριθμό.
 Πολλαπλασιασμός κάθε στοιχείου του πίνακα με σταθερό αριθμό.
 
-##### Αρχείο prakseis.h:
+##### Αρχείο matrix_operations_lib.h:
 το αρχείο περιέχει τα declarations για το αρχείο prakseis.c
 
 ## Πηγές
@@ -181,4 +181,5 @@ multiply_byNumber():
     <br>Έτος: 2021-2022
     <br>Διδάσκων: Χρήστος Σεβαστιάδης</br>
 * Η Γλώσσα C Σε Βάθος - Νίκος Χατζηγιαννάκης
-* https://www.tutorialspoint.com/cprogramming/c_return_arrays_from_function.htm
+* Εισαγωγή στη γραμμική άλγεβρα και αναλυτική γεωμετρία -  Θεοδώρα Ιωαννίδου
+* https://www.tutorialspoint.com/cprogramming/c_return_arrays_from_function.htm 
